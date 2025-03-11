@@ -1,7 +1,22 @@
-/* SwapForm */
+.homepage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #1e1e1e, #121212);
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+.content-container {
+  display: flex;
+  gap: 20px;
+  max-width: 1000px;
+  width: 100%;
+}
+
 .swap-form {
-  max-width: 500px;
-  margin: 0 auto;
+  flex: 1;
   padding: 30px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -48,4 +63,77 @@
 
 .swap-button:hover {
   transform: translateY(-2px);
+}
+
+.price-list {
+  flex: 1;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.price-list h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.price-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.price-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
+}
+
+.price-list li:last-child {
+  border-bottom: none;
+}
+
+.price-list li:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.crypto-name {
+  font-weight: bold;
+}
+
+.crypto-price {
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-change {
+  font-size: 0.9em;
+}
+
+.crypto-price.positive {
+  color: #00ff88;
+}
+
+.crypto-price.negative {
+  color: #ff4444;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
