@@ -1,6 +1,11 @@
 import requests
 from django.http import JsonResponse
 from .models import CryptoCurrency
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 def get_crypto_data(request):
     url = "https://api.coingecko.com/api/v3/simple/price"
@@ -40,3 +45,10 @@ def get_crypto_data(request):
         'price_change_24h': crypto.price_change_24h,
     } for crypto in cryptos]
     return JsonResponse(result, safe=False)
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+class LoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
