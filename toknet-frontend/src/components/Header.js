@@ -13,14 +13,14 @@ const Header = ({ isAuthenticated, user, onLogout }) => {
         <Link to="/about" className="nav-link">About</Link>
         {isAuthenticated ? (
           <div className="user-info">
-            <span>Welcome, {user?.username}</span>
+            <span>Welcome, {user?.email || user?.username || 'User'}</span>
             <button onClick={onLogout} className="auth-button">Logout</button>
           </div>
         ) : (
-          <div className="auth-buttons">
-            <Link to="/login" className="auth-button">Login</Link>
-            <Link to="/register" className="auth-button">Register</Link>
-          </div>
+          <>
+            <Link to="/login" className="nav-link">Login</Link>
+            <Link to="/register" className="nav-link">Register</Link>
+          </>
         )}
       </nav>
     </header>

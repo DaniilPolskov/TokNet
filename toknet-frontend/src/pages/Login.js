@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/Auth.css';
+import { jwtDecode } from 'jwt-decode';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
@@ -28,7 +29,8 @@ const Login = ({ onLogin }) => {
       const data = await response.json();
       localStorage.setItem('access_token', data.access);
       localStorage.setItem('refresh_token', data.refresh);
-      onLogin(data);
+      const decoded = jwtDecode(data.access);
+      onLogin(decoded);
       navigate('/');
     } catch (err) {
       setError(err.message);

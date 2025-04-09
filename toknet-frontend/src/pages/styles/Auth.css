@@ -2,7 +2,7 @@
     max-width: 400px;
     margin: 2rem auto;
     padding: 2rem;
-    background: #fff;
+    background: #232323;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
@@ -10,7 +10,7 @@
   .auth-form h2 {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #333;
+    color: #ffffff;
   }
   
   .form-group {
@@ -34,7 +34,7 @@
   .auth-button {
     width: 100%;
     padding: 0.75rem;
-    background-color: #4a6bff;
+    background-color: #141414;
     color: white;
     border: none;
     border-radius: 4px;
@@ -43,8 +43,16 @@
     margin-top: 1rem;
   }
   
+  
+  .resend-code {
+    font-size: 0.9rem;
+    color: #888;
+    margin-top: 6px;
+    cursor: not-allowed;
+  }
+
   .auth-button:hover {
-    background-color: #3a5bef;
+    background-color: #363636;
   }
   
   .auth-switch {
@@ -56,11 +64,70 @@
   .auth-switch button {
     background: none;
     border: none;
-    color: #4a6bff;
+    color: #141414;
     cursor: pointer;
     text-decoration: underline;
   }
   
   .auth-switch button:hover {
-    color: #3a5bef;
+    color: #363636;
+  }
+
+  .react-tel-input {
+    width: 100%;
+  }
+  
+  .react-tel-input .form-control {
+    width: 100% !important;
+    background-color: #393939 !important;
+    border: 1px solid #ddd !important;
+    color: #fff !important;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: 4px;
+  }
+  
+  .react-tel-input .flag-dropdown {
+    background-color: #393939 !important;
+    border-right: 1px solid #ddd !important;
+    border-radius: 4px 0 0 4px;
+  }
+  
+  .react-tel-input .selected-flag {
+    background-color: #393939 !important;
+  }
+  
+  .react-tel-input .flag-dropdown.open .selected-flag {
+    background-color: #393939 !important;
+  }
+  
+  .react-tel-input .country-list {
+    background-color: #2e2e2e !important;
+    color: white !important;
+  }
+  
+  .react-tel-input .country:hover {
+    background-color: #444 !important;
+  }
+  
+  .react-tel-input .country .country-name {
+    color: white !important;
+  }
+  
+  .react-tel-input .country.selected {
+    background-color: #393939 !important;
+  }
+  
+  .react-tel-input .country.selected .country-name {
+    color: white !important;
+  }
+
+  .react-tel-input .country-list .country.highlight {
+    background-color: #393939 !important;
+    color: white !important;
+  }
+  
+  .react-tel-input .country.selected {
+    background-color: #393939 !important;
+    color: white !important;
   }

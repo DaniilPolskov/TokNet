@@ -1,11 +1,29 @@
-import requests
-from django.http import JsonResponse
-from .models import CryptoCurrency
 from rest_framework import generics, status
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
+from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer
+from .models import CryptoCurrency
+from django.http import JsonResponse
+import requests
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        return Response({"detail": "User registered successfully."}, status=status.HTTP_201_CREATED)
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
 
 def get_crypto_data(request):
     url = "https://api.coingecko.com/api/v3/simple/price"
@@ -15,9 +33,6 @@ def get_crypto_data(request):
         'include_24hr_change': 'true',
     }
     response = requests.get(url, params=params)
-    
-    print("API Response:", response.json())
-    
     data = response.json()
 
     for crypto_id, price_data in data.items():
@@ -34,8 +49,6 @@ def get_crypto_data(request):
                 crypto.price = price_data['usd']
                 crypto.price_change_24h = price_data['usd_24h_change']
                 crypto.save()
-        else:
-            print(f"Key 'usd' or 'usd_24h_change' not found for {crypto_id}")
 
     cryptos = CryptoCurrency.objects.all()
     result = [{
@@ -45,10 +58,3 @@ def get_crypto_data(request):
         'price_change_24h': crypto.price_change_24h,
     } for crypto in cryptos]
     return JsonResponse(result, safe=False)
-
-class RegisterView(generics.CreateAPIView):
-    serializer_class = RegisterSerializer
-    permission_classes = [AllowAny]
-
-class LoginView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer

@@ -48,13 +48,13 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #000000;
+  color: #ffffff;
 }
 
 .swap-button {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background: #141414;
   color: #ffffff;
   border-radius: 8px;
   font-weight: bold;
