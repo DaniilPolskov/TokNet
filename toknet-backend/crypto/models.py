@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
@@ -27,9 +27,17 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email_or_phone, password, **extra_fields)
 
 
-class CustomUser(AbstractUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     email_or_phone = models.CharField(max_length=100, unique=True)
-    username = models.CharField(max_length=150, blank=True, null=True)
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    middle_name = models.CharField(max_length=100, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email_or_phone'
     REQUIRED_FIELDS = []

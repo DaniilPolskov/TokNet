@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Homepage from './components/Homepage';
 import Footer from './components/Footer';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import './global.css';
 import './App.css';
-import { jwtDecode } from 'jwt-decode';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,36 +15,39 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        setIsAuthenticated(true);
-        setUser({ username: decoded.username || decoded.email?.split('@')[0] });
-      } catch (err) {
-        console.error('Invalid token:', err);
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-      }
+    const savedUser = JSON.parse(localStorage.getItem('user'));
+
+    if (token && savedUser) {
+      setIsAuthenticated(true);
+      setUser(savedUser);
     }
   }, []);
 
   const handleLogin = (credentials) => {
     setIsAuthenticated(true);
-    setUser({ username: credentials.username || credentials.email?.split('@')[0] });
-    return <Navigate to="/" />;
+    const user = { username: credentials.email.split('@')[0], email: credentials.email };
+    setUser(user);
+    localStorage.setItem('access_token', credentials.token);
+    localStorage.setItem('user', JSON.stringify(user));
   };
 
   const handleRegister = (userData) => {
     setIsAuthenticated(true);
-    setUser({ username: userData.username });
-    return <Navigate to="/" />;
+    const user = { username: userData.username, email: userData.email };
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
     setUser(null);
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+  };
+
+  const handleProfileUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
   };
 
   return (
@@ -58,8 +61,18 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Homepage isAuthenticated={isAuthenticated} />} />
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/register" element={<Register onRegister={handleRegister} />} />
+            <Route 
+              path="/login" 
+              element={<Login onLogin={handleLogin} />} 
+            />
+            <Route 
+              path="/register" 
+              element={<Register onRegister={handleRegister} />} 
+            />
+            <Route 
+              path="/profile" 
+              element={<Profile user={user} onProfileUpdate={handleProfileUpdate} />} 
+            />
           </Routes>
         </main>
         <Footer />

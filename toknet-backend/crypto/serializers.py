@@ -21,7 +21,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -33,3 +32,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data['email_or_phone'] = self.user.email_or_phone
         return data
+    
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'first_name', 'last_name', 'middle_name', 'date_of_birth', 
+            'address', 'profile_picture'
+        )
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance

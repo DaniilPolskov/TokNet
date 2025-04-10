@@ -119,7 +119,6 @@ const Register = ({ onRegister }) => {
                 />
               </div>
             )}
-
             <button type="submit" className="auth-button">
               Send Code
             </button>
