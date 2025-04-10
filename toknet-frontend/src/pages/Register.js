@@ -50,13 +50,25 @@ const Register = ({ onRegister }) => {
         },
         body: JSON.stringify({ email_or_phone: emailOrPhone, password }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
+    
       const data = await response.json();
+    
+      if (!response.ok) {
+        let message = 'Registration failed';
+    
+        if (data.message) {
+          message = data.message;
+        } else if (data.detail) {
+          message = data.detail;
+        } else if (data.email_or_phone) {
+          message = data.email_or_phone[0];
+        } else if (data.password) {
+          message = data.password[0];
+        }
+    
+        throw new Error(message);
+      }
+    
       onRegister(data);
       navigate('/');
     } catch (err) {
