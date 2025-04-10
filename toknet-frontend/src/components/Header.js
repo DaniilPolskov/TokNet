@@ -1,15 +1,27 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './styles/Header.css';
 
-const Header = () => {
+const Header = ({ isAuthenticated, user, onLogout }) => {
   return (
     <header className="header">
       <div className="logo">TokNet</div>
       <nav className="nav">
-        <a href="/" className="nav-link">Home</a>
-        <a href="/swap" className="nav-link">Swap</a>
-        <a href="/tokens" className="nav-link">Tokens</a>
-        <a href="/about" className="nav-link">About</a>
+        <Link to="/" className="nav-link">Home</Link>
+        <Link to="/swap" className="nav-link">Swap</Link>
+        <Link to="/tokens" className="nav-link">Tokens</Link>
+        <Link to="/about" className="nav-link">About</Link>
+        {isAuthenticated ? (
+          <div className="user-info">
+            <span>Welcome, {user?.email || user?.username || 'User'}</span>
+            <button onClick={onLogout} className="auth-button">Logout</button>
+          </div>
+        ) : (
+          <>
+            <Link to="/login" className="nav-link">Login</Link>
+            <Link to="/register" className="nav-link">Register</Link>
+          </>
+        )}
       </nav>
     </header>
   );
