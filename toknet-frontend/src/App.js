@@ -66,7 +66,7 @@ function App() {
               element={<Login onLogin={handleLogin} />} 
             />
             <Route 
-              path="/register" 
+              path="/singup" 
               element={<Register onRegister={handleRegister} />} 
             />
             <Route 

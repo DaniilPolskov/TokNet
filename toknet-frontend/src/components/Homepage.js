@@ -5,11 +5,12 @@ export default function HomePage() {
   return (
     <div className="homepage">
       <section className="main-banner">
-        <h1>Exchange Your</h1> 
+        <h1>Exchange&nbsp; Your</h1> 
         <h1>Crypto Easily</h1>
-        <p>Sign up now and start exchanging your favorite </p> 
-        <p>cryptocurrencies.</p>
-        <button className="start-btn">Get Started</button>
+        <p>Sign up now and start exchanging your favorite cryptocurrencies.</p>
+        <div style={{ textAlign: 'center' }}>
+          <button className="start-btn">Get Started</button>
+        </div>
       </section>
 
       <div className="exchange-box">
@@ -51,4 +52,4 @@ export default function HomePage() {
       </section>
     </div>
   );
-}
+} 
