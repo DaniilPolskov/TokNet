@@ -54,7 +54,6 @@ body {
   max-width: 600px;
   margin: 20px auto;
   color: #686868;
-  font-family: 'Lato', sans-serif;
 }
 
 .main-banner h1:last-of-type {
@@ -70,10 +69,7 @@ body {
   border-radius: 10px;
   cursor: pointer;
   font-size: 18px;
-  margin-top: 0px;
-  font-family: 'Lato', sans-serif;
   font-weight: bold;
-
 }
 
 .exchange-box {
@@ -82,30 +78,53 @@ body {
   border: 1px solid #333;
   border-radius: 16px;
   padding: 32px;
-  margin: 60px auto;
+  margin: 60px auto 200px;
   text-align: center;
-  margin-bottom: 200px;
-  font-family: 'Lato', sans-serif;
 }
 
-.exchange-row {
+.crypto-select-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
-  font-size: 24px;
+  gap: 30px;
   margin-bottom: 40px;
 }
 
-.arrow {
-  font-size: 24px;
-  color: #777;
+.crypto-select {
+  position: relative;
 }
 
-.crypto {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 80px;
+  background-color: #222;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: block;
+  border-radius: 10px;
+}
+
+.dropdown-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-family: 'Lato', sans-serif;
+}
+
+.dropdown-item:hover {
+  background-color: #333;
+  border-radius: 5px;
+}
+
+.dropdown-item img {
+  width: 20px;
+  height: 20px;
+}
+
+.arrow {
+  color: #aaa;
+  font-size: 24px;
 }
 
 .exchange-values {
@@ -115,19 +134,80 @@ body {
   font-size: 20px;
 }
 
-.value {
+.input-box {
+  background-color: #1A1A1A;
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1;
+  margin: 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.crypto-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.crypto-info img {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  
+}
+
+.crypto-symbol {
+  font-size: 18px;
   font-weight: bold;
+  color: #ccc;
+}
+
+.crypto-input {
+  background-color: transparent;
+  border: none;
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
+  width: 100%;
+  outline: none;
+  border-bottom: 2px solid #555;
+  padding-right: 10px;
+}
+
+.crypto-input:focus {
+  border-color: #fff;
+}
+
+.crypto-output {
+  font-size: 28px;
+  font-weight: bold;
+  color: #fff;
 }
 
 .label {
+  margin-top: 8px;
   font-size: 14px;
-  color: #888;
+  color: #777;
 }
 
-.rate {
-  font-size: 15px;
+.exchange-rate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
   color: #aaa;
-  margin-top: 10px;
+  margin-top: 20px;
+}
+
+.exchange-rate-label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.exchange-rate-value {
+  font-weight: bold;
 }
 
 .buttom-banners {
@@ -141,11 +221,16 @@ body {
 .buttom-banner h3 {
   font-size: 34px;
   margin-bottom: 8px;
-  font-family: 'Lato', sans-serif;
 }
 
 .buttom-banner p {
   font-size: 24px;
   color: #aaa;
-  font-family: 'Lato', sans-serif;
+}
+
+.crypto-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }

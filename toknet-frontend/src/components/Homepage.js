@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './styles/Homepage.css';
+import btcIcon from '../icons/btc.svg';
+import ethIcon from '../icons/eth.svg';
+import usdtIcon from '../icons/usdt.svg';
 
 export default function HomePage() {
   const [fromCrypto, setFromCrypto] = useState('BTC');
   const [toCrypto, setToCrypto] = useState('USDT');
   const [cryptoData, setCryptoData] = useState({});
   const [exchangeRate, setExchangeRate] = useState(null);
+  const [amount, setAmount] = useState(1);
+  const [showFromDropdown, setShowFromDropdown] = useState(false);
+  const [showToDropdown, setShowToDropdown] = useState(false);
+
+  const availableCryptos = [
+    { symbol: 'BTC', name: 'Bitcoin', icon: btcIcon },
+    { symbol: 'ETH', name: 'Ethereum', icon: ethIcon },
+    { symbol: 'USDT', name: 'Tether', icon: usdtIcon },
+  ];
 
   useEffect(() => {
     const fetchData = () => {
@@ -35,10 +47,16 @@ export default function HomePage() {
     }
   }, [cryptoData, fromCrypto, toCrypto]);
 
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    const sanitizedValue = value.replace(/[^0-9.]/g, '');
+    setAmount(sanitizedValue);
+  };
+
   return (
     <div className="homepage">
       <section className="main-banner">
-        <h1>Exchange&nbsp; Your</h1> 
+        <h1>Exchange&nbsp; Your</h1>
         <h1>Crypto Easily</h1>
         <p>Sign up now and start exchanging your favorite cryptocurrencies.</p>
         <div style={{ textAlign: 'center' }}>
@@ -47,35 +65,95 @@ export default function HomePage() {
       </section>
 
       <div className="exchange-box">
-        <div className="exchange-row">
-          <select value={fromCrypto} onChange={e => setFromCrypto(e.target.value)}>
-            <option value="BTC">BTC</option>
-            <option value="ETH">ETH</option>
-            <option value="USDT">USDT</option>
-          </select>
-          <span className="arrow">⇄</span>
-          <select value={toCrypto} onChange={e => setToCrypto(e.target.value)}>
-            <option value="USDT">USDT</option>
-            <option value="BTC">BTC</option>
-            <option value="ETH">ETH</option>
-          </select>
+        <div className="crypto-select-container">
+          <div className="crypto-select" onClick={() => setShowFromDropdown(prev => !prev)}>
+            <img src={availableCryptos.find(crypto => crypto.symbol === fromCrypto).icon} alt={fromCrypto} className="crypto-icon" />
+            <span className="crypto-label">{fromCrypto}</span>
+            <span className="dropdown-arrow">▾</span>
+            {showFromDropdown && (
+              <div className="dropdown-list">
+                {availableCryptos.map((crypto) => (
+                  <div
+                    key={crypto.symbol}
+                    className="dropdown-item"
+                    onClick={() => {
+                      setFromCrypto(crypto.symbol);
+                      setShowFromDropdown(false);
+                    }}
+                  >
+                    <img src={crypto.icon} alt={crypto.symbol} className="crypto-icon" />
+                    <span className="crypto-label">{crypto.symbol}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="switch-button" onClick={() => {
+            const temp = fromCrypto;
+            setFromCrypto(toCrypto);
+            setToCrypto(temp);
+          }}>
+            <span className="switch-icon">⇄</span>
+          </div>
+
+          <div className="crypto-select" onClick={() => setShowToDropdown(prev => !prev)}>
+            <img src={availableCryptos.find(crypto => crypto.symbol === toCrypto).icon} alt={toCrypto} className="crypto-icon" />
+            <span className="crypto-label">{toCrypto}</span>
+            <span className="dropdown-arrow">▾</span>
+            {showToDropdown && (
+              <div className="dropdown-list">
+                {availableCryptos.map((crypto) => (
+                  <div
+                    key={crypto.symbol}
+                    className="dropdown-item"
+                    onClick={() => {
+                      setToCrypto(crypto.symbol);
+                      setShowToDropdown(false);
+                    }}
+                  >
+                    <img src={crypto.icon} alt={crypto.symbol} className="crypto-icon" />
+                    <span className="crypto-label">{crypto.symbol}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="exchange-values">
-          <div>
-            <p className="value">0.5 {fromCrypto}</p>
+          <div className="input-box">
+            <div className="crypto-info">
+              <img src={availableCryptos.find(crypto => crypto.symbol === fromCrypto).icon} alt={fromCrypto} className="crypto-icon" />
+              <span className="crypto-symbol">{fromCrypto}</span>
+            </div>
+            <input
+              type="text"
+              value={amount}
+              onChange={handleAmountChange}
+              className="crypto-input"
+              placeholder="0.00"
+            />
             <p className="label">You pay</p>
           </div>
-          <div>
-            <p className="value">
-              {exchangeRate ? (0.5 * exchangeRate).toFixed(2) : '...'} {toCrypto}
-            </p>
+          <div className="input-box">
+            <div className="crypto-info">
+              <img src={availableCryptos.find(crypto => crypto.symbol === toCrypto).icon} alt={toCrypto} className="crypto-icon" />
+              <span className="crypto-symbol">{toCrypto}</span>
+            </div>
+            <div className="crypto-output">
+              {exchangeRate ? (amount * exchangeRate).toFixed(2) : '...'}
+            </div>
             <p className="label">You receive</p>
           </div>
         </div>
-        <p className="rate">
-          Exchange Rate 1 {fromCrypto} ≈ {exchangeRate ? exchangeRate.toFixed(6) : '...'} {toCrypto}
-        </p>
+
+        <div className="exchange-rate">
+          <p className="exchange-rate-label">Exchange Rate:</p>
+          <p className="exchange-rate-value">
+            1 {fromCrypto} ≈ {exchangeRate ? exchangeRate.toFixed(6) : '...'} {toCrypto}
+          </p>
+        </div>
       </div>
 
       <section className="buttom-banners">
