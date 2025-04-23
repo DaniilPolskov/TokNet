@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
     symbol = models.CharField(max_length=10)
+    coingecko_id = models.CharField(max_length=100, unique=True) 
     price = models.FloatField()
     price_change_24h = models.FloatField(default=0)
     last_updated = models.DateTimeField(auto_now=True)

@@ -33,7 +33,7 @@ body {
 .main-banner {
   text-align: center;
   margin-top: -10px;
-  margin-bottom: 80px;
+  margin-bottom: 100px;
   min-height: 400px;
   display: flex;
   flex-direction: column;
@@ -84,6 +84,8 @@ body {
   padding: 32px;
   margin: 60px auto;
   text-align: center;
+  margin-bottom: 200px;
+  font-family: 'Lato', sans-serif;
 }
 
 .exchange-row {
