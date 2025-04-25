@@ -61,79 +61,21 @@
   transition: transform 0.3s ease;
 }
 
-.swap-button:hover {
-  transform: translateY(-2px);
+.resend-code {
+  margin-top: 0.5rem;
+  font-size: 14px;
 }
 
-.price-list {
-  flex: 1;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.countdown {
+  color: #999;
 }
 
-.price-list h3 {
-  text-align: center;
-  margin-bottom: 20px;
-  color: #ffffff;
-}
-
-.price-list ul {
-  list-style: none;
+.resend-button {
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
   padding: 0;
-  margin: 0;
-}
-
-.price-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  transition: background 0.3s ease;
-}
-
-.price-list li:last-child {
-  border-bottom: none;
-}
-
-.price-list li:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.crypto-name {
-  font-weight: bold;
-}
-
-.crypto-price {
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.price-change {
-  font-size: 0.9em;
-}
-
-.crypto-price.positive {
-  color: #00ff88;
-}
-
-.crypto-price.negative {
-  color: #ff4444;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  font-size: 14px;
+  text-decoration: underline;
 }

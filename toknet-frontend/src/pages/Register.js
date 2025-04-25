@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './styles/Auth.css';
 import PhoneInput from 'react-phone-input-2';
@@ -13,64 +13,77 @@ const Register = ({ onRegister }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [resendTimer, setResendTimer] = useState(0);
   const navigate = useNavigate();
 
   const emailOrPhone = authType === 'email' ? email : `+${phone}`;
 
+  useEffect(() => {
+    let interval;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
+  const isPasswordValid = (pwd) => {
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,25}$/;
+    return regex.test(pwd);
+  };
+
   const handleSendCode = (e) => {
     e.preventDefault();
-
     if ((authType === 'email' && !email) || (authType === 'phone' && !phone)) {
       setError('Please enter your email or phone.');
       return;
     }
-
     setError('');
     setStep(2);
+    setResendTimer(60);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleResendCode = () => {
+    if (resendTimer > 0) return;
+    setResendTimer(60);
+  };
 
+  const handleVerifyCode = (e) => {
+    e.preventDefault();
     if (!code) {
       setError('Please enter the code sent to you.');
       return;
     }
+    setError('');
+    setStep(3);
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (password !== confirmPassword) {
       setError("Passwords don't match!");
       return;
     }
-
+    if (!isPasswordValid(password)) {
+      setError(
+        'Password must be 8-25 characters long, include at least one uppercase letter, one lowercase letter, and one number.'
+      );
+      return;
+    }
     try {
       const response = await fetch('http://localhost:8000/api/register/', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email_or_phone: emailOrPhone, password }),
       });
-    
       const data = await response.json();
-    
       if (!response.ok) {
-        let message = 'Registration failed';
-    
-        if (data.message) {
-          message = data.message;
-        } else if (data.detail) {
-          message = data.detail;
-        } else if (data.email_or_phone) {
-          message = data.email_or_phone[0];
-        } else if (data.password) {
-          message = data.password[0];
-        }
-    
+        let message = data.message || data.detail || data.email_or_phone?.[0] || data.password?.[0] || 'Registration failed';
         throw new Error(message);
       }
-    
       onRegister(data);
-      navigate('/');
+      navigate('/profile');
     } catch (err) {
       setError(err.message);
     }
@@ -82,19 +95,15 @@ const Register = ({ onRegister }) => {
         <h2>Register</h2>
         {error && <div className="auth-error">{error}</div>}
 
-        {step === 1 ? (
+        {step === 1 && (
           <form onSubmit={handleSendCode}>
             <div className="form-group">
               <label>Register with</label>
-              <select
-                value={authType}
-                onChange={(e) => setAuthType(e.target.value)}
-              >
+              <select value={authType} onChange={(e) => setAuthType(e.target.value)}>
                 <option value="email">Email</option>
                 <option value="phone">Phone</option>
               </select>
             </div>
-
             {authType === 'email' ? (
               <div className="form-group">
                 <label>Email</label>
@@ -112,20 +121,16 @@ const Register = ({ onRegister }) => {
                   country={'us'}
                   value={phone}
                   onChange={setPhone}
-                  inputProps={{
-                    name: 'phone',
-                    required: true,
-                  }}
+                  inputProps={{ name: 'phone', required: true }}
                 />
               </div>
             )}
-
-            <button type="submit" className="auth-button">
-              Send Code
-            </button>
+            <button type="submit" className="auth-button">Next</button>
           </form>
-        ) : (
-          <form onSubmit={handleSubmit}>
+        )}
+
+        {step === 2 && (
+          <form onSubmit={handleVerifyCode}>
             <div className="form-group">
               <label>Verification Code</label>
               <input
@@ -134,9 +139,22 @@ const Register = ({ onRegister }) => {
                 onChange={(e) => setCode(e.target.value)}
                 required
               />
-              <div className="resend-code">Didn't get the code?</div>
+              <div className="resend-code">
+                {resendTimer > 0 ? (
+                  <span className="countdown">Resend in {resendTimer}s</span>
+                ) : (
+                  <button type="button" className="resend-button" onClick={handleResendCode}>
+                    Resend Code
+                  </button>
+                )}
+              </div>
             </div>
+            <button type="submit" className="auth-button">Next</button>
+          </form>
+        )}
 
+        {step === 3 && (
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Password</label>
               <input
@@ -146,7 +164,6 @@ const Register = ({ onRegister }) => {
                 required
               />
             </div>
-
             <div className="form-group">
               <label>Confirm Password</label>
               <input
@@ -156,10 +173,15 @@ const Register = ({ onRegister }) => {
                 required
               />
             </div>
-
-            <button type="submit" className="auth-button">
-              Register
-            </button>
+            <div className="password-rules">
+              <ul>
+                <li>8–25 characters</li>
+                <li>At least one uppercase letter</li>
+                <li>At least one lowercase letter</li>
+                <li>At least one number</li>
+              </ul>
+            </div>
+            <button type="submit" className="auth-button">Register</button>
           </form>
         )}
       </div>

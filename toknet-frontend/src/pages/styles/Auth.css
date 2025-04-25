@@ -1,132 +1,154 @@
 .auth-form {
-    max-width: 400px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: #232323;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .auth-form h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #ffffff;
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: #555;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 1rem;
-  }
-  
-  .auth-button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #141414;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 1rem;
-  }
-  
-  .resend-code {
-    font-size: 0.9rem;
-    color: #888;
-    margin-top: 6px;
-    cursor: not-allowed;
-  }
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #232323;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-  .auth-button:hover {
-    background-color: #363636;
-  }
-  
-  .auth-switch {
-    text-align: center;
-    margin-top: 1rem;
-    color: #666;
-  }
-  
-  .auth-switch button {
-    background: none;
-    border: none;
-    color: #141414;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  
-  .auth-switch button:hover {
-    color: #363636;
-  }
+.auth-form h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
 
-  .react-tel-input {
-    width: 100%;
-  }
-  
-  .react-tel-input .form-control {
-    width: 100% !important;
-    background-color: #393939 !important;
-    border: 1px solid #ddd !important;
-    color: #fff !important;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border-radius: 4px;
-  }
-  
-  .react-tel-input .flag-dropdown {
-    background-color: #393939 !important;
-    border-right: 1px solid #ddd !important;
-    border-radius: 4px 0 0 4px;
-  }
-  
-  .react-tel-input .selected-flag {
-    background-color: #393939 !important;
-  }
-  
-  .react-tel-input .flag-dropdown.open .selected-flag {
-    background-color: #393939 !important;
-  }
-  
-  .react-tel-input .country-list {
-    background-color: #2e2e2e !important;
-    color: white !important;
-  }
-  
-  .react-tel-input .country:hover {
-    background-color: #444 !important;
-  }
-  
-  .react-tel-input .country .country-name {
-    color: white !important;
-  }
-  
-  .react-tel-input .country.selected {
-    background-color: #393939 !important;
-  }
-  
-  .react-tel-input .country.selected .country-name {
-    color: white !important;
-  }
+.form-group {
+  margin-bottom: 1rem;
+}
 
-  .react-tel-input .country-list .country.highlight {
-    background-color: #393939 !important;
-    color: white !important;
-  }
-  
-  .react-tel-input .country.selected {
-    background-color: #393939 !important;
-    color: white !important;
-  }
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #141414;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.auth-button:hover {
+  background-color: #363636;
+}
+
+.resend-code {
+  font-size: 0.9rem;
+  color: #888;
+  margin-top: 6px;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+  color: #666;
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: #141414;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.auth-switch button:hover {
+  color: #363636;
+}
+
+.react-tel-input {
+  width: 100%;
+}
+
+.react-tel-input .form-control {
+  width: 100% !important;
+  background-color: #393939 !important;
+  border: 1px solid #ddd !important;
+  color: #fff !important;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 4px;
+}
+
+.react-tel-input .flag-dropdown {
+  background-color: #393939 !important;
+  border-right: 1px solid #ddd !important;
+  border-radius: 4px 0 0 4px;
+}
+
+.react-tel-input .selected-flag {
+  background-color: #393939 !important;
+}
+
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background-color: #393939 !important;
+}
+
+.react-tel-input .country-list {
+  background-color: #2e2e2e !important;
+  color: white !important;
+}
+
+.react-tel-input .country:hover {
+  background-color: #444 !important;
+}
+
+.react-tel-input .country .country-name {
+  color: white !important;
+}
+
+.react-tel-input .country.selected {
+  background-color: #393939 !important;
+}
+
+.react-tel-input .country.selected .country-name {
+  color: white !important;
+}
+
+.react-tel-input .country-list .country.highlight {
+  background-color: #393939 !important;
+  color: white !important;
+}
+
+.react-tel-input .country.selected {
+  background-color: #393939 !important;
+  color: white !important;
+}
+
+.auth-switch-text {
+  color: #555555;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.auth-link {
+  color: #555555;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-link:hover {
+  color: #777;
+}
+
+.password-rules {
+  font-size: 16px;
+  margin-left: 0.5rem;
+  color: #555;
+}
