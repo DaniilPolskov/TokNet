@@ -35,12 +35,11 @@ const Header = ({ isAuthenticated, user, onLogout, children }) => {
               )}
             </div>
           ) : (
-            <Link to="/signup" className="nav-link sign-up">Sign up</Link>
+            <Link to="/singup" className="nav-link sign-up">Sign up</Link>
           )}
         </nav>
       </header>
 
-      <main>{children}</main>
     </>
   );
 };
