@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './styles/Profile.css';
 
 const Profile = () => {
   const [userData, setUserData] = useState({
@@ -17,6 +18,11 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
+      if (!token) {
+        console.warn('No access token, skipping profile fetch');
+        return;
+      }
+
       try {
         const response = await axios.get('http://localhost:8000/api/profile/', {
           headers: {
@@ -25,7 +31,13 @@ const Profile = () => {
         });
         setUserData(response.data);
       } catch (err) {
-        setError('Failed to fetch user data');
+        if (err.response && err.response.status === 401) {
+          setError('Unauthorized. Please login again.');
+          localStorage.removeItem('access_token');
+          window.location.href = '/login'; // редирект на логин если 401
+        } else {
+          setError('Failed to fetch user data');
+        }
       }
     };
 
@@ -50,6 +62,11 @@ const Profile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!token) {
+      setError('No access token. Please login.');
+      return;
+    }
+
     const formData = new FormData();
     for (const key in userData) {
       if (userData[key]) {
@@ -67,10 +84,25 @@ const Profile = () => {
 
       if (response.status === 200) {
         setSuccess('Profile updated successfully');
+        setError('');
       }
     } catch (err) {
       setError('Failed to update profile');
+      setSuccess('');
     }
+  };
+
+  const getProfileImageSrc = () => {
+    if (userData.profile_picture) {
+      if (typeof userData.profile_picture === 'string') {
+        return userData.profile_picture.startsWith('/profile_pics/')
+          ? userData.profile_picture
+          : `http://localhost:8000${userData.profile_picture}`;
+      }
+      // Если это файл из формы
+      return URL.createObjectURL(userData.profile_picture);
+    }
+    return '/default-avatar.jpg'; // всегда корректный путь к дефолтной аватарке
   };
 
   return (
@@ -78,77 +110,80 @@ const Profile = () => {
       <h2>User Profile</h2>
       {error && <p className="error">{error}</p>}
       {success && <p className="success">{success}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>First Name</label>
-          <input
-            type="text"
-            name="first_name"
-            value={userData.first_name}
-            onChange={handleChange}
+
+      <div className="profile-content">
+        <div className="avatar-container">
+          <img
+            src={getProfileImageSrc()}
+            alt="Profile"
+            className="avatar"
           />
         </div>
 
-        <div>
-          <label>Last Name</label>
-          <input
-            type="text"
-            name="last_name"
-            value={userData.last_name}
-            onChange={handleChange}
-          />
-        </div>
+        <form onSubmit={handleSubmit} className="profile-form">
+          <div>
+            <label>First Name</label>
+            <input
+              type="text"
+              name="first_name"
+              value={userData.first_name}
+              onChange={handleChange}
+            />
+          </div>
 
-        <div>
-          <label>Middle Name</label>
-          <input
-            type="text"
-            name="middle_name"
-            value={userData.middle_name}
-            onChange={handleChange}
-          />
-        </div>
+          <div>
+            <label>Last Name</label>
+            <input
+              type="text"
+              name="last_name"
+              value={userData.last_name}
+              onChange={handleChange}
+            />
+          </div>
 
-        <div>
-          <label>Birth Date</label>
-          <input
-            type="date"
-            name="date_of_birth"
-            value={userData.date_of_birth}
-            onChange={handleChange}
-          />
-        </div>
+          <div>
+            <label>Middle Name</label>
+            <input
+              type="text"
+              name="middle_name"
+              value={userData.middle_name}
+              onChange={handleChange}
+            />
+          </div>
 
-        <div>
-          <label>Address</label>
-          <input
-            type="text"
-            name="address"
-            value={userData.address}
-            onChange={handleChange}
-          />
-        </div>
+          <div>
+            <label>Birth Date</label>
+            <input
+              type="date"
+              name="date_of_birth"
+              value={userData.date_of_birth}
+              onChange={handleChange}
+            />
+          </div>
 
-        <div>
-          <label>Profile Photo</label>
-          <input
-            type="file"
-            name="profile_picture"
-            onChange={handlePhotoChange}
-          />
-          {userData.profile_picture && (
-            <div className="preview">
-              <img
-                src={`http://localhost:8000${userData.profile_picture}`}
-                alt="Profile"
-                width="150"
-              />
-            </div>
-          )}
-        </div>
+          <div>
+            <label>Address</label>
+            <input
+              type="text"
+              name="address"
+              value={userData.address}
+              onChange={handleChange}
+            />
+          </div>
 
-        <button type="submit">Update Profile</button>
-      </form>
+          <div>
+            <label>Profile Photo</label>
+            <input
+              type="file"
+              name="profile_picture"
+              onChange={handlePhotoChange}
+              accept="image/*"
+            />
+          </div>
+
+          <button type="submit">Update Profile</button>
+        </form>
+      </div>
     </div>
   );
 };
