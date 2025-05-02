@@ -73,6 +73,9 @@ function App() {
               path="/profile" 
               element={<Profile user={user} onProfileUpdate={handleProfileUpdate} />} 
             />
+            <Route path="/user/:id" 
+            element={<Profile />} 
+            />
           </Routes>
         </main>
       </div>
