@@ -2,6 +2,7 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
 from .models import CryptoCurrency, CustomUser
@@ -35,9 +36,11 @@ class RegisterView(generics.CreateAPIView):
         self.perform_create(serializer)
         return Response({"detail": "User registered successfully."}, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
 def user_detail(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    return render(request, '/', {'user': user})
+    serializer = UserSerializer(user)
+    return Response(serializer.data)
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer

@@ -6,6 +6,7 @@ import Homepage from './components/Homepage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import UserProfile from './pages/UserProfile';
 import './global.css';
 import './App.css';
 
@@ -74,7 +75,7 @@ function App() {
               element={<Profile user={user} onProfileUpdate={handleProfileUpdate} />} 
             />
             <Route path="/user/:id" 
-            element={<Profile />} 
+            element={<UserProfile />} 
             />
           </Routes>
         </main>
