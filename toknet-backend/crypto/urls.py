@@ -8,4 +8,5 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('profile/', ProfileUpdateView.as_view(), name='profile-update'),
     path('profile/update/', ProfileUpdateView.as_view(), name='profile-update'),
+    path('user/<uuid:user_id>/', views.user_detail, name='user_detail'),
 ]

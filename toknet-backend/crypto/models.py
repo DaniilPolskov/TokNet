@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+import uuid
 
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
@@ -11,8 +12,7 @@ class CryptoCurrency(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) - ${self.price}"
-
-
+    
 class CustomUserManager(BaseUserManager):
     def create_user(self, email_or_phone, password=None, **extra_fields):
         if not email_or_phone:
@@ -26,9 +26,9 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email_or_phone, password, **extra_fields)
-
-
+    
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email_or_phone = models.CharField(max_length=100, unique=True)
     username = models.CharField(max_length=100, default='NewUser')
     first_name = models.CharField(max_length=100, blank=True)

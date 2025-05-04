@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import UserProfile from './pages/UserProfile';
 import './global.css';
 import './App.css';
 
@@ -76,7 +77,10 @@ function App() {
             />
             <Route 
               path="/profile/edit" 
-              element={<EditProfile />} 
+              element={<EditProfile />}
+            /> 
+            <Route path="/user/:id" 
+            element={<UserProfile />} 
             />
           </Routes>
         </main>
