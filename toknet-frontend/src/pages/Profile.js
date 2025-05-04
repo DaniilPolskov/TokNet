@@ -1,35 +1,70 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import './styles/Profile.css';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/profile/', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const text = await res.text(); 
+          console.error('Error response:', text);
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => setUser(data))
+      .catch(err => console.error('Fetch error:', err));
+  }, []);
+
+  const handleEditClick = () => {
+    navigate('/profile/edit');
+  };
+
+  if (!user) return <div>Loading...</div>;
   return (
     <>
       <div className="profile-container">
         <div className="profile-header">
           <div className="avatar">
-            <span className="avatar-text">?</span>
+            {user.profile_picture ? (
+              <img
+                src={user.profile_picture}
+                alt="avatar"
+                className="avatar-img"
+              />
+            ) : (
+              <span className="avatar-text">?</span>
+            )}
           </div>
 
           <div className="user-info">
             <div className="user-info-container">
-
               <div className="info-block">
-                <h2 className="username">TokNetLover</h2>
+                <h2 className="username">{user.username}</h2>
               </div>
 
               <div className="info-block">
                 <span className="status-indicator">● Online status</span>
               </div>
 
-              <div className="info-block">
-                <span className="location">New York, USA</span>
-              </div>
+              {user.show_location && user.address && (
+                <div className="info-block">
+                  <span className="location">{user.address}</span>
+                </div>
+              )}
 
               <div className="info-block token-list">
                 <span className="token-badge token-btc">BTC</span>
                 <span className="token-badge token-eth">ETH</span>
               </div>
-
             </div>
           </div>
 
@@ -80,7 +115,9 @@ const Profile = () => {
 
       <div className="actions-section-container">
         <div className="actions-section">
-          <button className="action-button">Edit profile</button>
+          <button className="action-button" onClick={handleEditClick}>
+            Edit profile
+          </button>
           <button className="action-button">History</button>
           <button className="action-button">Level</button>
           <button className="action-button">FAQ</button>

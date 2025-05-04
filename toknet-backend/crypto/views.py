@@ -7,6 +7,8 @@ from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, Us
 from .models import CryptoCurrency
 from django.http import JsonResponse
 import requests
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser
 
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -16,11 +18,16 @@ class ProfileUpdateView(APIView):
         return Response(serializer.data)
 
     def put(self, request):
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        user = request.user
+        data = request.data.copy()
+        profile_picture = request.FILES.get('profile_picture')
+        if profile_picture:
+            user.profile_picture = profile_picture
+        serializer = UserSerializer(user, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-    
+        
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -69,3 +76,19 @@ def get_crypto_data(request):
             })
 
     return JsonResponse(result, safe=False)
+
+@api_view(['GET', 'PUT'])
+@parser_classes([MultiPartParser, FormParser])
+def profile_view(request):
+    user = request.user
+
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

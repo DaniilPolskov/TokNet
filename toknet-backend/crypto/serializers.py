@@ -34,11 +34,15 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
     
 class UserSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.ImageField(use_url=True)
+
     class Meta:
         model = User
         fields = (
-            'first_name', 'last_name', 'middle_name', 'date_of_birth', 
-            'address', 'profile_picture'
+            'username', 'first_name', 'last_name', 'date_of_birth',
+            'address', 'profile_picture',
+            'show_location', 'show_day_month_birthdate', 'show_year_birthdate',
+            'kyc_completed'
         )
 
     def update(self, instance, validated_data):

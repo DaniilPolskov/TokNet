@@ -286,7 +286,13 @@
   color: #ffffff;
 }
 
+.info-block-wrapper {
+  display: inline-block;
+}
+
 .info-block {
+  display: block;
+  width: max-content;
   border: 1px solid #262626;
   border-radius: 1rem;
   padding: 1rem;
@@ -294,6 +300,7 @@
   font-weight: 500;
   color: white;
   margin-bottom: 1rem;
+  background-color: #1A1A1A;
 }
 
 .token-list {
@@ -319,6 +326,7 @@
 .action-button:active {
   transform: scale(0.98);
 }
+
 
 @media (max-width: 768px) {
   .actions-section {

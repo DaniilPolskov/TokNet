@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
     symbol = models.CharField(max_length=10)
-    coingecko_id = models.CharField(max_length=100, unique=True) 
+    coingecko_id = models.CharField(max_length=100, unique=True)
     price = models.FloatField()
     price_change_24h = models.FloatField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
@@ -30,12 +30,24 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email_or_phone = models.CharField(max_length=100, unique=True)
+    username = models.CharField(max_length=100, default='NewUser')
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
-    middle_name = models.CharField(max_length=100, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
+
     address = models.TextField(null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+
+    show_location = models.BooleanField(default=True)
+    show_day_month_birthdate = models.BooleanField(default=True)
+    show_year_birthdate = models.BooleanField(default=True)
+    kyc_completed = models.BooleanField(default=False)
+
+    profile_picture = models.ImageField(
+        upload_to='profile_pics/',
+        null=True,
+        blank=True,
+        default='profile_pics/default.svg'
+    )
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
