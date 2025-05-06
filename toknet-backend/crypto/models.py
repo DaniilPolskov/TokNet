@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 import uuid
+from datetime import timedelta
+from django.utils import timezone
 
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
@@ -34,6 +36,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
 
+    last_seen = models.DateTimeField(null=True, blank=True)
+
     address = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
 
@@ -41,6 +45,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     show_day_month_birthdate = models.BooleanField(default=True)
     show_year_birthdate = models.BooleanField(default=True)
     kyc_completed = models.BooleanField(default=False)
+
+    transaction_count = models.PositiveIntegerField(default=0)
+    lot_quantity = models.PositiveIntegerField(default=0)
 
     profile_picture = models.ImageField(
         upload_to='profile_pics/',

@@ -34,7 +34,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
     
 class UserSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.ImageField(use_url=True)
+    profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
 
     class Meta:
         model = User
@@ -42,9 +42,13 @@ class UserSerializer(serializers.ModelSerializer):
             'username', 'first_name', 'last_name', 'date_of_birth',
             'address', 'profile_picture',
             'show_location', 'show_day_month_birthdate', 'show_year_birthdate',
-            'kyc_completed'
+            'kyc_completed', 'transaction_count', 'lot_quantity'
+            
         )
 
+    def get_is_online(self, obj):
+        return obj.is_online()
+    
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

@@ -6,7 +6,11 @@ import Homepage from './components/Homepage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
-import EditProfile from './pages/EditProfile';
+import EditProfile from './pages/EditProfile.js';
+import KYCVerification from './pages/KYCVerification.js';
+import TransactionHistory from './pages/TransactionHistory.js';
+import UserLevel from './pages/UserLevel.js';
+import FAQ from './pages/FAQ.js';
 import UserProfile from './pages/UserProfile';
 import './global.css';
 import './App.css';
@@ -82,6 +86,17 @@ function App() {
             <Route path="/user/:id" 
             element={<UserProfile />} 
             />
+            <Route path="/profile/edit/KYCVerification" 
+            element={<KYCVerification />} 
+            />
+            <Route path="/profile/transactions" 
+            element={<TransactionHistory />} 
+            />
+            <Route path="/profile/faq" 
+            element={<FAQ />} />
+            
+            <Route path="/profile/Level"
+            element={<UserLevel />} />
           </Routes>
         </main>
       </div>

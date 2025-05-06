@@ -1,24 +1,56 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import './styles/EditProfile.css';
 
 const EditProfile = () => {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("TokNetLover");
   const [location, setLocation] = useState("New York, USA");
-  const [online, setOnline] = useState(true);
   const [avatar, setAvatar] = useState(null);
   const [showLocation, setShowLocation] = useState(true);
-  const [birthdate, setBirthdate] = useState("");
-  const [showDayMonth, setShowDayMonth] = useState(true);
-  const [showYear, setShowYear] = useState(true);
 
   const handleAvatarChange = (e) => {
     if (e.target.files[0]) {
-      setAvatar(URL.createObjectURL(e.target.files[0]));
+      setAvatar(e.target.files[0]);
     }
   };
 
-  const handleSave = () => {
-    alert("Changes saved!");
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("You must be logged in.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("username", username);
+      formData.append("address", location);
+      formData.append("show_location", showLocation);
+      
+      if (avatar instanceof File) {
+        formData.append("profile_picture", avatar);
+      }
+
+      await axios.put("http://localhost:8000/api/profile/update/", formData, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      alert("Changes saved!");
+      navigate("/profile");
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Failed to save profile.");
+    }
+  };
+
+  const handleKYC = () => {
+    navigate("/profile/edit/KYCVerification");
   };
 
   return (
@@ -27,7 +59,7 @@ const EditProfile = () => {
         <div className="edit-avatar-section">
           <div className="avatar-preview">
             {avatar ? (
-              <img src={avatar} alt="avatar" className="avatar-img" />
+              <img src={URL.createObjectURL(avatar)} alt="avatar" className="avatar-img" />
             ) : (
               <span className="avatar-placeholder">?</span>
             )}
@@ -66,37 +98,8 @@ const EditProfile = () => {
             </label>
           </div>
 
-          <div className="form-block">
-            <label>Date of Birth</label>
-            <input
-              type="date"
-              value={birthdate}
-              onChange={(e) => setBirthdate(e.target.value)}
-            />
-          </div>
-
           <div className="form-block checkbox-block">
-            <label>
-              <input
-                type="checkbox"
-                checked={showDayMonth}
-                onChange={() => setShowDayMonth(!showDayMonth)}
-              /> Show Day & Month
-            </label>
-          </div>
-
-          <div className="form-block checkbox-block">
-            <label>
-              <input
-                type="checkbox"
-                checked={showYear}
-                onChange={() => setShowYear(!showYear)}
-              /> Show Year
-            </label>
-          </div>
-
-          <div className="form-block checkbox-block">
-            <button className="kyc-button">Complete KYC</button>
+            <button className="kyc-button" onClick={handleKYC}>Complete KYC</button>
           </div>
 
           <button className="save-button" onClick={handleSave}>Save Changes</button>
