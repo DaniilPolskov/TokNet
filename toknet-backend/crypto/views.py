@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
-from .models import CryptoCurrency, CustomUser
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer, WalletSerializer
+from .models import CryptoCurrency, CustomUser, Wallet
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import requests
@@ -99,3 +99,12 @@ def profile_view(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def wallet_view(request):
+    if not request.user.is_authenticated:
+        return Response({'detail': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    wallets = Wallet.objects.filter(user=request.user)
+    serializer = WalletSerializer(wallets, many=True)
+    return Response(serializer.data)

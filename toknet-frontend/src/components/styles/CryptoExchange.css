@@ -1,0 +1,103 @@
+.exchange-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+}
+
+.exchange-container {
+  position: absolute;
+  width: 583px;
+  height: 748.45px;
+  left: 50%;
+  top: 50px;
+  transform: translateX(-50%);
+  background: #141414;
+  border-radius: 10px;
+  padding: 32px;
+  color: #fff;
+  font-family: 'Urbanist', sans-serif;
+}
+
+.exchange-title {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 43px;
+  margin-bottom: 40px;
+}
+
+.label {
+  font-size: 22px;
+  line-height: 34px;
+  margin-bottom: 8px;
+}
+
+.input-group {
+  position: relative;
+  background: #191919;
+  border-radius: 9px;
+  height: 89.29px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+}
+
+.input-field {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 28px;
+  width: 100px;
+}
+
+.currency-label {
+  position: absolute;
+  right: 24px;
+  color: #fff;
+  font-size: 28px;
+}
+
+.currency-icon {
+  position: absolute;
+  right: 100px;
+  width: 65.65px;
+  height: 65.65px;
+}
+
+.swap-icon {
+  width: 65.65px;
+  height: 65.65px;
+  background: #1C1C1E;
+  border-radius: 50%;
+  margin: 0 auto 32px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.swap-arrows {
+  font-size: 30px;
+  margin: 0;
+  padding: 0;
+}
+
+.exchange-button {
+  background: #191919;
+  opacity: 0.51;
+  border-radius: 9px;
+  height: 78.78px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.rate-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  margin-top: 8px;
+}

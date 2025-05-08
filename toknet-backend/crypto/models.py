@@ -29,6 +29,16 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email_or_phone, password, **extra_fields)
     
+class Wallet(models.Model):
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='wallets')
+    currency = models.CharField(max_length=10)
+    currency_name = models.CharField(max_length=100)
+    balance = models.DecimalField(max_digits=20, decimal_places=8)
+    price_change_24h = models.FloatField(default=0)
+    
+    def __str__(self):
+        return f"{self.user.username}'s {self.currency} wallet"
+        
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email_or_phone = models.CharField(max_length=100, unique=True)

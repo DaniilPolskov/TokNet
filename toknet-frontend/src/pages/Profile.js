@@ -6,29 +6,41 @@ import './styles/Profile.css';
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
+    const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        
+
         if (!token) {
           throw new Error('Please login to access this page');
         }
 
-        const response = await axios.get('http://localhost:8000/api/profile/', {
+        const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           }
         });
 
-        if (!response.data) {
+        if (!profileResponse.data) {
           throw new Error('No profile data received');
         }
 
-        setUser(response.data);
+        setUser(profileResponse.data);
+
+        const walletResponse = await axios.get('http://localhost:8000/api/wallets/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        if (walletResponse.data && walletResponse.data.length > 0) {
+          setWallets(walletResponse.data);
+        }
+
       } catch (err) {
         console.error('Profile load error:', err);
         setError(err.message);
@@ -42,7 +54,7 @@ const Profile = () => {
       }
     };
 
-    fetchUserProfile();
+    fetchUserData();
   }, [navigate]);
 
   const handleEditClick = () => {
@@ -52,7 +64,7 @@ const Profile = () => {
   const handleHistoryClick = () => {
     navigate('/profile/transactions');
   };
-  
+
   const handleLevelClick = () => {
     navigate('/profile/level');
   };
@@ -60,7 +72,7 @@ const Profile = () => {
   const handleFaqClick = () => {
     navigate('/profile/faq');
   };
-  
+
   const formatBirthdate = (dateStr, showDayMonth, showYear) => {
     const date = new Date(dateStr);
     const options = {
@@ -69,6 +81,12 @@ const Profile = () => {
       year: showYear ? 'numeric' : undefined,
     };
     return date.toLocaleDateString('en-US', options);
+  };
+
+  const getPnlClass = (change) => {
+    if (change > 0) return 'positive';
+    if (change < 0) return 'negative';
+    return 'neutral';
   };
 
   if (loading) {
@@ -143,10 +161,15 @@ const Profile = () => {
               </div>
             )}
 
-            <div className="info-block token-list">
-              <span className="token-badge token-btc">BTC</span>
-              <span className="token-badge token-eth">ETH</span>
-            </div>
+            {wallets.length > 0 && (
+              <div className="info-block token-list">
+                {wallets.map(wallet => (
+                  <span key={wallet.currency} className={`token-badge token-${wallet.currency.toLowerCase()}`}>
+                    {wallet.currency}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -162,37 +185,25 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="wallet-section">
-        <div className="wallet-header">
-          <h3 className="wallet-title">Your wallet:</h3>
-          <button className="view-all-button">View all</button>
-        </div>
-        <div className="wallet-cards">
-          <div className="wallet-card">
-            <div className="currency-name">Ripple (XRP)</div>
-            <div className="currency-balance">69.236967</div>
-            <div className="pnl positive">+0.09% PnL</div>
+      {wallets.length > 0 && (
+        <div className="wallet-section">
+          <div className="wallet-header">
+            <h3 className="wallet-title">Your wallet:</h3>
+            <button className="view-all-button">View all</button>
           </div>
-
-          <div className="wallet-card">
-            <div className="currency-name">Ethereum (ETH)</div>
-            <div className="currency-balance">0.650848452</div>
-            <div className="pnl negative">-3.9% PnL</div>
-          </div>
-
-          <div className="wallet-card">
-            <div className="currency-name">USD Coin (USDC)</div>
-            <div className="currency-balance">19</div>
-            <div className="pnl neutral">+0.00% PnL</div>
-          </div>
-
-          <div className="wallet-card">
-            <div className="currency-name">Bitcoin (BTC)</div>
-            <div className="currency-balance">0.0001558</div>
-            <div className="pnl positive">+0.2% PnL</div>
+          <div className="wallet-cards">
+            {wallets.map(wallet => (
+              <div key={wallet.currency} className="wallet-card">
+                <div className="currency-name">{wallet.currency_name} ({wallet.currency})</div>
+                <div className="currency-balance">{wallet.balance}</div>
+                <div className={`pnl ${getPnlClass(wallet.price_change_24h)}`}>
+                  {wallet.price_change_24h > 0 ? '+' : ''}{wallet.price_change_24h}% PnL
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
       <div className="actions-section-container">
         <div className="actions-section">

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from crypto.models import Wallet
 
 
 User = get_user_model()
@@ -33,6 +34,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['email_or_phone'] = self.user.email_or_phone
         return data
     
+class WalletSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallet
+        fields = ('currency', 'currency_name', 'balance', 'price_change_24h')
+
+
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
 
