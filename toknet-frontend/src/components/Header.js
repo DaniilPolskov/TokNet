@@ -17,7 +17,7 @@ const Header = ({ isAuthenticated, user, onLogout, children }) => {
           <Link to="/" className="nav-link">Home</Link>
           <Link to="/exchange" className="nav-link">Exchange</Link>
           <Link to="/rates" className="nav-link">Rates</Link>
-          <Link to="/support" className="nav-link">Support</Link>
+          <Link to="/technical-support" className="nav-link">Support</Link>
 
           {isAuthenticated ? (
             <div

@@ -12,6 +12,7 @@ import TransactionHistory from './pages/TransactionHistory.js';
 import UserLevel from './pages/UserLevel.js';
 import FAQ from './pages/FAQ.js';
 import UserProfile from './pages/UserProfile';
+import TechnicalSupport from './pages/TechnicalSupport.js';
 import CryptoExchangePage from './components/CryptoExchange';
 import ExchangeStep2 from './components/ExchangeStep2';
 import OrderCancelled from './components/OrderCancelled';
@@ -114,6 +115,11 @@ function App() {
             <Route path="/order-cancelled" 
             element={<OrderCancelled />} 
             />
+
+            <Route path="/technical-support" 
+            element={<TechnicalSupport />} 
+            />
+
           </Routes>
         </main>
       </div>
