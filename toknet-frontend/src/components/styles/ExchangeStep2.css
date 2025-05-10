@@ -106,8 +106,6 @@
 }
   
 .qr-code {
-    width: 200px;
-    height: 200px;
     margin: 0 auto;
     background: white;
     border-radius: 8px;

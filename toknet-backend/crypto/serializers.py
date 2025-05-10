@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from crypto.models import Wallet
+from crypto.models import Wallet, Transaction, ExchangeOrder
 
 
 User = get_user_model()
@@ -61,3 +61,31 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+    
+class ExchangeOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExchangeOrder
+        fields = [
+            'id', 'user', 'order_id', 'from_currency', 'to_currency',
+            'amount', 'rate', 'fee', 'deposit_address', 'receive_address',
+            'receive_amount', 'status', 'created_at', 'expires_at'
+        ]
+        read_only_fields = ('user', 'order_id', 'status', 'created_at', 'expires_at', 'receive_amount')
+
+    def create(self, validated_data):
+        order = ExchangeOrder(**validated_data)
+        order.receive_amount = order.calculate_receive_amount()
+        order.save()
+        return order\
+        
+    def validate(self, data):
+        if data['from_currency'] == data['to_currency']:
+            raise serializers.ValidationError("From and To currencies must be different.")
+        if data['amount'] <= 0:
+            raise serializers.ValidationError("Amount must be greater than zero.")
+        return data   
+                        
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { QRCodeCanvas } from 'qrcode.react';
 import "./styles/ExchangeStep2.css";
@@ -14,7 +14,9 @@ export default function ExchangeStep2() {
   const [stepPhase, setStepPhase] = useState('deposit');
   const [showStep3, setShowStep3] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const [transactionData, setTransactionData] = useState(null);
+  const hasCreatedOrder = useRef(false);
+  
   const from = searchParams.get('from');
   const to = searchParams.get('to');
   const amount = parseFloat(searchParams.get('amount'));
@@ -30,13 +32,54 @@ export default function ExchangeStep2() {
     ? `bitcoin:${depositAddress}?amount=${parseFloat(amount).toFixed(8)}`
     : depositAddress;
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setOrderId(Math.random().toString(36).substring(2, 18));
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
+    useEffect(() => {
+      const storageKey = `order_created_${from}_${to}_${amount}`;
+    
+      if (sessionStorage.getItem(storageKey)) return;
+    
+      sessionStorage.setItem(storageKey, 'true');
+    
+      const createOrder = async () => {
+        try {
+          const token = localStorage.getItem('access_token');
+          if (!token) throw new Error('Нет токена доступа');
+    
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/exchange/create/`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              from_currency: from,
+              to_currency: to,
+              amount,
+              rate,
+              fee,
+              receive_address: receiveAddress,
+              deposit_address: depositAddress
+            })
+          });
+    
+          if (!response.ok) {
+            const text = await response.text();
+            console.error("Ошибка от сервера:", text);
+            throw new Error(`Ошибка от сервера: ${text}`);
+          }
+    
+          const data = await response.json();
+          console.log('Ответ от сервера:', data);
+          setTransactionData(data);
+          setOrderId(data.order_id || Math.random().toString(36).substring(2, 18));
+          setIsLoading(false);
+    
+        } catch (error) {
+          console.error("Ошибка при создании ордера:", error);
+        }
+      };
+    
+      createOrder();
+    }, [from, to, amount, rate, fee, receiveAddress]);
 
   useEffect(() => {
     if (!isLoading && timeLeft > 0 && stepPhase !== 'completed') {
@@ -97,7 +140,7 @@ export default function ExchangeStep2() {
           <div className="success-message">Средства успешно получены!</div>
         </div>
       )}
-      
+
       {stepPhase === 'confirmation' ? (
         <div className="confirmation-box">
           <div className="confirmation-phase">
@@ -143,20 +186,20 @@ export default function ExchangeStep2() {
 
             <label>Отправьте сумму по этому адресу (ERC20):</label>
             <div className="copy-box">
-              <span>0xa32f942065aсe7be760418сca4743a32bfc3441c</span>
-              <button onClick={() => copyToClipboard('0xa3f921065aae7be760418bca2843a32bfc34421c')}>
+              <span>{depositAddress}</span>
+              <button onClick={() => copyToClipboard(depositAddress)}>
                 <img src={CopyIcon} alt="Скопировать" className="copy-icon" />
               </button>
             </div>
 
             <div className="row">
               <div className="copy-box">
-                <span>32128.12196927 ETH</span>
-                <button onClick={() => copyToClipboard('32128.12196927')}>
+                <span>{receiveAmount} {to}</span>
+                <button onClick={() => copyToClipboard(receiveAmount)}>
                   <img src={CopyIcon} alt="Скопировать" className="copy-icon" />
                 </button>
               </div>
-              <div className="currency">Валюта: Ethereum ETH</div>
+              <div className="currency">Валюта: {to}</div>
             </div>
 
             <div className="instruction">
@@ -201,7 +244,7 @@ export default function ExchangeStep2() {
                 </button>
               </div>
             )}
-
+            
             <button className="support-btn">🔔 Обратиться в поддержку</button>
             <button className="cancel-btn" onClick={() => navigate('/order-cancelled')}>
               Отменить

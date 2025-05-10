@@ -1,16 +1,20 @@
+from datetime import time
+import threading
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer, WalletSerializer
-from .models import CryptoCurrency, CustomUser, Wallet
+from .serializers import ExchangeOrderSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer, WalletSerializer
+from .models import CryptoCurrency, CustomUser, ExchangeOrder, Wallet
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import requests
-from rest_framework.decorators import api_view, parser_classes
+import time
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.core.cache import cache
 
 class ProfileUpdateView(APIView):
     permission_classes = [IsAuthenticated]
@@ -53,6 +57,10 @@ class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
 def get_crypto_data(request):
+    cached_data = cache.get('crypto_prices')
+    if cached_data:
+        return JsonResponse(cached_data, safe=False)
+    
     cryptos = CryptoCurrency.objects.all()
     ids = ','.join([crypto.coingecko_id for crypto in cryptos])
 
@@ -81,7 +89,8 @@ def get_crypto_data(request):
                 'price': crypto.price,
                 'price_change_24h': crypto.price_change_24h,
             })
-
+    
+    cache.set('crypto_prices', result, timeout=60)
     return JsonResponse(result, safe=False)
 
 @api_view(['GET', 'PUT'])
@@ -101,6 +110,7 @@ def profile_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def wallet_view(request):
     if not request.user.is_authenticated:
         return Response({'detail': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -108,3 +118,51 @@ def wallet_view(request):
     wallets = Wallet.objects.filter(user=request.user)
     serializer = WalletSerializer(wallets, many=True)
     return Response(serializer.data)
+
+def startStatusPolling(order_id):
+    interval = 100
+    while True:
+        order = ExchangeOrder.objects.get(order_id=order_id)
+        if order.status == 'completed':
+            print(f"Order {order_id} has been completed.")
+            break
+        time.sleep(interval)
+        
+class ExchangeCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        serializer = ExchangeOrderSerializer(data=request.data)
+        if serializer.is_valid():
+            order = serializer.save(user=request.user)
+
+            polling_thread = threading.Thread(target=startStatusPolling, args=(order.order_id,))
+            polling_thread.start()
+
+            return Response({
+                'order_id': order.order_id,
+                'deposit_address': order.deposit_address,
+                'expires_at': order.expires_at
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class OrderStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, order_id):
+        order = get_object_or_404(ExchangeOrder, order_id=order_id, user=request.user)
+        serializer = ExchangeOrderSerializer(order)
+        return Response(serializer.data)
+
+class ConfirmDepositView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, order_id):
+        order = get_object_or_404(ExchangeOrder, order_id=order_id, user=request.user)
+        if order.status != 'pending':
+            return Response({'error': 'Invalid order status'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = 'received'
+        order.save()
+        
+        return Response({'status': 'deposit confirmed'})
