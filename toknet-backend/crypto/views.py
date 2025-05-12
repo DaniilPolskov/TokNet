@@ -56,43 +56,70 @@ def user_detail(request, user_id):
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
     
+
 def get_crypto_data(request):
+    CryptoCurrency.initialize_defaults()
+    
     cached_data = cache.get('crypto_prices')
     if cached_data:
         return JsonResponse(cached_data, safe=False)
     
     cryptos = CryptoCurrency.objects.all()
-    ids = ','.join([crypto.coingecko_id for crypto in cryptos])
-
-    url = "https://api.coingecko.com/api/v3/simple/price"
-    params = {
-        'ids': ids,
-        'vs_currencies': 'usd',
-        'include_24hr_change': 'true',
-    }
-
-    response = requests.get(url, params=params)
-    data = response.json()
-
-    result = []
-
-    for crypto in cryptos:
-        price_info = data.get(crypto.coingecko_id)
-        if price_info:
-            crypto.price = price_info.get('usd', 0)
-            crypto.price_change_24h = price_info.get('usd_24h_change', 0)
-            crypto.save()
-
-            result.append({
-                'name': crypto.name,
-                'symbol': crypto.symbol,
-                'price': crypto.price,
-                'price_change_24h': crypto.price_change_24h,
-            })
+    if not cryptos.exists():
+        return JsonResponse([], safe=False)
     
-    cache.set('crypto_prices', result, timeout=60)
-    return JsonResponse(result, safe=False)
+    ids = ','.join([crypto.coingecko_id for crypto in cryptos if crypto.coingecko_id])
 
+    try:
+        url = "https://api.coingecko.com/api/v3/simple/price"
+        params = {
+            'ids': ids,
+            'vs_currencies': 'usd',
+            'include_24hr_change': 'true',
+        }
+
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        
+        result = []
+        update_needed = False
+
+        for crypto in cryptos:
+            if crypto.coingecko_id in data:
+                price_info = data[crypto.coingecko_id]
+                new_price = price_info.get('usd', 0)
+                new_change = price_info.get('usd_24h_change', 0)
+                
+                if abs(crypto.price - new_price) > 0.01 or abs(crypto.price_change_24h - new_change) > 0.1:
+                    crypto.price = new_price
+                    crypto.price_change_24h = new_change
+                    crypto.save()
+                    update_needed = True
+                
+                result.append({
+                    'name': crypto.name,
+                    'symbol': crypto.symbol,
+                    'price': crypto.price,
+                    'price_change_24h': crypto.price_change_24h,
+                })
+
+        if result:
+            cache.set('crypto_prices', result, timeout=60)
+            return JsonResponse(result, safe=False)
+        
+        return JsonResponse([], safe=False)
+            
+    except requests.RequestException as e:
+        print(f"Error fetching from CoinGecko: {str(e)}")
+        result = [{
+            'name': crypto.name,
+            'symbol': crypto.symbol,
+            'price': crypto.price,
+            'price_change_24h': crypto.price_change_24h,
+        } for crypto in cryptos]
+        return JsonResponse(result, safe=False)
+        
 @api_view(['GET', 'PUT'])
 @parser_classes([MultiPartParser, FormParser])
 def profile_view(request):
@@ -154,15 +181,30 @@ class OrderStatusView(APIView):
         serializer = ExchangeOrderSerializer(order)
         return Response(serializer.data)
 
-class ConfirmDepositView(APIView):
+class CompleteOrderView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request, order_id):
         order = get_object_or_404(ExchangeOrder, order_id=order_id, user=request.user)
         if order.status != 'pending':
-            return Response({'error': 'Invalid order status'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Order must be in pending status'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
         
         order.status = 'received'
         order.save()
         
-        return Response({'status': 'deposit confirmed'})
+        return Response({'status': 'payment received'})
+        
+class CancelOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, order_id):
+        order = get_object_or_404(ExchangeOrder, order_id=order_id, user=request.user)
+        if order.status != 'pending':
+            return Response({'error': 'Order can only be cancelled in pending status'}, 
+                           status=status.HTTP_400_BAD_REQUEST)
+        
+        order.status = 'cancelled'
+        order.save()
+        
+        return Response({'status': 'order cancelled'})

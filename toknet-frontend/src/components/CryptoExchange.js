@@ -4,22 +4,25 @@ import btcIcon from '../icons/btc.svg';
 import ethIcon from '../icons/eth.svg';
 import usdtIcon from '../icons/usdt.svg';
 import "./styles/CryptoExchange.css";
-
+import axios from 'axios';
 
 export default function CryptoExchange() {
   const navigate = useNavigate();
   const [fromCrypto, setFromCrypto] = useState("BTC");
   const [toCrypto, setToCrypto] = useState("USDT");
-  const [amount, setAmount] = useState(1);
-  const [exchangeRate, setExchangeRate] = useState(101.5);
+  const [amount, setAmount] = useState("");
+  const [receiveAddress, setReceiveAddress] = useState("");
+  const [exchangeRate, setExchangeRate] = useState(null);
   const [feeRate, setFeeRate] = useState(0.002);
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
+  const [cryptoData, setCryptoData] = useState({});
+  const [network, setNetwork] = useState("");
 
   const availableCryptos = [
-    { symbol: "BTC", name: "Bitcoin", icon: btcIcon },
-    { symbol: "ETH", name: "Ethereum", icon: ethIcon },
-    { symbol: "USDT", name: "Tether", icon: usdtIcon },
+    { symbol: "BTC", name: "Bitcoin", icon: btcIcon, network: "BTC" },
+    { symbol: "ETH", name: "Ethereum", icon: ethIcon, network: "ERC20" },
+    { symbol: "USDT", name: "Tether", icon: usdtIcon, network: "TRC20" },
   ];
 
   const getIcon = (symbol) => {
@@ -27,16 +30,32 @@ export default function CryptoExchange() {
     return crypto ? crypto.icon : '';
   };
 
+  const getNetwork = (symbol) => {
+    const crypto = availableCryptos.find((c) => c.symbol === symbol);
+    return crypto ? crypto.network : '';
+  };
+
+  useEffect(() => {
+    setNetwork(getNetwork(toCrypto));
+  }, [toCrypto]);
+
   const handleExchange = () => {
-    navigate(
-      `/exchange/step2?from=${fromCrypto}&to=${toCrypto}&amount=${amount}&rate=${exchangeRate}&fee=${feeRate}`
-    );
+    if (exchangeRate && receiveAddress) {
+      navigate(
+        `/exchange/step2?from=${fromCrypto}&to=${toCrypto}&amount=${amount}&rate=${exchangeRate}&fee=${feeRate}&receiveAddress=${encodeURIComponent(receiveAddress)}&network=${network}`
+      );
+    }
   };
 
   const handleAmountChange = (e) => {
     const value = e.target.value;
-    const sanitized = value.replace(/[^0-9.]/g, "");
-    setAmount(sanitized);
+    if (/^\d*\.?\d*$/.test(value)) {
+      setAmount(value);
+    }
+  };
+
+  const handleAddressChange = (e) => {
+    setReceiveAddress(e.target.value);
   };
 
   const swapped = () => {
@@ -44,7 +63,48 @@ export default function CryptoExchange() {
     setToCrypto(fromCrypto);
   };
 
-  const outputAmount = (amount * exchangeRate * (1 - feeRate)).toFixed(2);
+  const formatOutputAmount = (value) => {
+    if (!value || isNaN(value)) return '0';
+    const num = parseFloat(value);
+    if (num >= 1) return num.toFixed(2);
+    if (num >= 0.1) return num.toFixed(3);
+    if (num >= 0.01) return num.toFixed(4);
+    return num.toFixed(6);
+  };
+
+  const outputAmount = exchangeRate && amount
+    ? formatOutputAmount(amount * exchangeRate * (1 - feeRate))
+    : '0';
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/crypto-data/');
+        if (res.data && res.data.length > 0) {
+          const data = res.data.reduce((acc, curr) => {
+            acc[curr.symbol] = curr;
+            return acc;
+          }, {});
+          setCryptoData(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch crypto data:', err);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (cryptoData[fromCrypto] && cryptoData[toCrypto]) {
+      const fromPrice = cryptoData[fromCrypto].price;
+      const toPrice = cryptoData[toCrypto].price;
+      const rate = fromPrice / toPrice;
+      setExchangeRate(rate);
+    }
+  }, [cryptoData, fromCrypto, toCrypto]);
 
   return (
     <div className="exchange-wrapper">
@@ -59,6 +119,7 @@ export default function CryptoExchange() {
             onChange={handleAmountChange}
             className="input-field"
             placeholder="0.00"
+            inputMode="decimal"
           />
           <div className="dropdown-wrapper">
             <div onClick={() => setShowFromDropdown(!showFromDropdown)} className="dropdown-toggle">
@@ -122,13 +183,30 @@ export default function CryptoExchange() {
           </div>
         </div>
 
-        <button className="exchange-button" onClick={handleExchange}>
+        <div className="address-input">
+          <p className="label">Your {toCrypto} address ({network})</p>
+          <input
+            type="text"
+            value={receiveAddress}
+            onChange={handleAddressChange}
+            className="input-field"
+            placeholder={`Enter your ${toCrypto} address`}
+          />
+        </div>
+
+        <button 
+          className="exchange-button" 
+          onClick={handleExchange}
+          disabled={!exchangeRate || !amount || !receiveAddress}
+        >
           Exchange
         </button>
 
         <div className="rate-row">
           <span>Exchange rate</span>
-          <span>1 {fromCrypto} = {exchangeRate.toFixed(3)} {toCrypto}</span>
+          <span>
+            {exchangeRate ? `1 ${fromCrypto} = ${exchangeRate.toFixed(2)} ${toCrypto}` : 'Loading...'}
+          </span>
         </div>
         <div className="rate-row">
           <span>Fee</span>

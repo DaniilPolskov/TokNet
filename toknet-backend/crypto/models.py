@@ -6,15 +6,33 @@ from django.utils import timezone
 
 class CryptoCurrency(models.Model):
     name = models.CharField(max_length=100)
-    symbol = models.CharField(max_length=10)
+    symbol = models.CharField(max_length=10, unique=True)
     coingecko_id = models.CharField(max_length=100, unique=True)
-    price = models.FloatField()
+    price = models.FloatField(default=0)
     price_change_24h = models.FloatField(default=0)
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.name} ({self.symbol}) - ${self.price}"
-    
+
+    @classmethod
+    def initialize_defaults(cls):
+        """Ensure we have the basic cryptocurrencies in the database"""
+        defaults = [
+            {'name': 'Bitcoin', 'symbol': 'BTC', 'coingecko_id': 'bitcoin'},
+            {'name': 'Ethereum', 'symbol': 'ETH', 'coingecko_id': 'ethereum'},
+            {'name': 'Tether', 'symbol': 'USDT', 'coingecko_id': 'tether'},
+        ]
+        
+        for crypto in defaults:
+            cls.objects.get_or_create(
+                symbol=crypto['symbol'],
+                defaults={
+                    'name': crypto['name'],
+                    'coingecko_id': crypto['coingecko_id']
+                }
+            )
+                
 class CustomUserManager(BaseUserManager):
     def create_user(self, email_or_phone, password=None, **extra_fields):
         if not email_or_phone:
@@ -82,7 +100,6 @@ class ExchangeOrder(models.Model):
         ('pending', 'Pending Deposit'),
         ('received', 'Deposit Received'),
         ('processing', 'Processing Exchange'),
-        ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]
     
@@ -115,7 +132,14 @@ class ExchangeOrder(models.Model):
     
     def calculate_receive_amount(self):
         return (self.amount * self.rate) * (1 - self.fee / 100)
-
+    
+    def complete(self):
+        if self.status == 'received':
+            self.status = 'completed'
+            self.save()
+            return True
+        return False
+    
 class Transaction(models.Model):
     order = models.ForeignKey(ExchangeOrder, on_delete=models.CASCADE)
     tx_hash = models.CharField(max_length=100, unique=True)

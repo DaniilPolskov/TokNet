@@ -146,3 +146,23 @@
   margin-top: 40px;
   font-size: 18px;
 }
+
+.address-input {
+  margin: 15px 0;
+  width: 100%;
+}
+
+.address-input .input-field {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-top: 5px;
+}
+
+.address-input .label {
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #666;
+}
