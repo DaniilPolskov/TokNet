@@ -109,15 +109,15 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <div className="avatar">
+        <div class="avatar-preview">
           {user.profile_picture ? (
             <img
-              src={user.profile_picture}
+              src={user.profile_picture || '/images/default.svg'}
               alt="avatar"
               className="avatar-img"
               onError={(e) => {
                 e.target.onerror = null;
-                e.target.src = '/media/profile_pics/default.svg';
+                e.target.src = '/images/default.svg';
               }}
             />
           ) : (
@@ -132,9 +132,12 @@ const Profile = () => {
             </div>
 
             <div className="info-block">
-              <span className={`status-indicator ${user.is_online ? 'online' : 'offline'}`}>
-                ● {user.is_online ? 'Online' : 'Offline'}
+            <div className="rating-level">
+              <span className="rating">
+                Rating: {"★".repeat(Math.round(user.rating || 0)).padEnd(5, "☆")}
               </span>
+              <span className="level">LVL {user.level ?? 1}</span>
+            </div>
             </div>
 
             {user.show_location && user.address && (

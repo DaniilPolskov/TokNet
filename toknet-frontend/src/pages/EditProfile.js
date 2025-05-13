@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import './styles/EditProfile.css';
@@ -6,46 +6,77 @@ import './styles/EditProfile.css';
 const EditProfile = () => {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("TokNetLover");
-  const [location, setLocation] = useState("New York, USA");
-  const [avatar, setAvatar] = useState(null);
-  const [showLocation, setShowLocation] = useState(true);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState(""); // Добавляем состояние для текущего пароля
+  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false); // Состояние для 2FA
+  const [isLoading, setIsLoading] = useState(true); // Состояние загрузки данных
 
-  const handleAvatarChange = (e) => {
-    if (e.target.files[0]) {
-      setAvatar(e.target.files[0]);
-    }
-  };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          alert("Вы не авторизованы.");
+          navigate("/login");
+          return;
+        }
+
+        const response = await axios.get("http://localhost:8000/api/profile/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const user = response.data;
+        setUsername(user.username || "");
+        setEmail(user.email || "");
+        setAvatarUrl(user.profile_picture);
+        setIs2FAEnabled(user.is_2fa_enabled); // Устанавливаем состояние для 2FA
+      } catch (err) {
+        console.error("Ошибка загрузки профиля:", err);
+        alert("Ошибка загрузки профиля.");
+        navigate("/login");
+      } finally {
+        setIsLoading(false); // Завершаем загрузку
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("You must be logged in.");
+        alert("Вы не авторизованы.");
         return;
       }
 
       const formData = new FormData();
       formData.append("username", username);
-      formData.append("address", location);
-      formData.append("show_location", showLocation);
-      
-      if (avatar instanceof File) {
-        formData.append("profile_picture", avatar);
+      formData.append("email", email);
+      if (password) {
+        formData.append("password", password);
+      }
+      if (currentPassword) {
+        formData.append("current_password", currentPassword); // Добавляем текущий пароль
       }
 
       await axios.put("http://localhost:8000/api/profile/update/", formData, {
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "multipart/form-data"
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      alert("Changes saved!");
+      alert("Изменения сохранены!");
       navigate("/profile");
     } catch (err) {
-      console.error("Save error:", err);
-      alert("Failed to save profile.");
+      console.error("Ошибка сохранения:", err);
+      alert("Не удалось сохранить профиль.");
     }
   };
 
@@ -53,18 +84,51 @@ const EditProfile = () => {
     navigate("/profile/edit/KYCVerification");
   };
 
+  const handle2FA = () => {
+    navigate("/profile/edit/enable2FA");
+  };
+
+  const handleDisable2FA = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("Вы не авторизованы.");
+        return;
+      }
+
+      const response = await axios.post(
+        "http://localhost:8000/api/2fa/disable/",  // Используем правильный URL для отключения
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setIs2FAEnabled(false); // Отключаем 2FA в UI
+      alert("2FA отключена.");
+    } catch (err) {
+      console.error("Ошибка при отключении 2FA:", err);
+      alert("Не удалось отключить 2FA.");
+    }
+  };
+
   return (
     <div className="edit-profile-container">
       <div className="edit-profile-card">
         <div className="edit-avatar-section">
           <div className="avatar-preview">
-            {avatar ? (
-              <img src={URL.createObjectURL(avatar)} alt="avatar" className="avatar-img" />
-            ) : (
-              <span className="avatar-placeholder">?</span>
-            )}
+            <img
+              src={avatarUrl || "/images/default.svg"}
+              alt="avatar"
+              className="avatar-img"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "/images/default.svg";
+              }}
+            />
           </div>
-          <input type="file" onChange={handleAvatarChange} className="file-input" />
         </div>
 
         <div className="form-section">
@@ -77,32 +141,60 @@ const EditProfile = () => {
             />
           </div>
 
-          {showLocation && (
-            <div className="form-block">
-              <label>Location</label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-          )}
+          <div className="form-block">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
-          <div className="form-block checkbox-block">
-            <label>
-              <input
-                type="checkbox"
-                checked={showLocation}
-                onChange={() => setShowLocation(!showLocation)}
-              /> Hide Location
-            </label>
+          <div className="form-block">
+            <label>Current Password</label>
+            <input
+              type="password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)} // Добавляем обработку изменения для текущего пароля
+              placeholder="Введите текущий пароль"
+            />
+          </div>
+
+          <div className="form-block">
+            <label>New Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Оставьте пустым, если не меняете"
+            />
           </div>
 
           <div className="form-block checkbox-block">
-            <button className="kyc-button" onClick={handleKYC}>Complete KYC</button>
+            <button className="kyc-button" onClick={handleKYC}>
+              Complete KYC
+            </button>
           </div>
 
-          <button className="save-button" onClick={handleSave}>Save Changes</button>
+          <div className="form-block checkbox-block">
+            {isLoading ? (
+              <button className="kyc-button" disabled>
+                Загрузка...
+              </button>
+            ) : is2FAEnabled ? (
+              <button className="kyc-button" onClick={handleDisable2FA}>
+                Disable 2FA
+              </button>
+            ) : (
+              <button className="kyc-button" onClick={handle2FA}>
+                Enable 2FA
+              </button>
+            )}
+          </div>
+
+          <button className="save-button" onClick={handleSave}>
+            Save Changes
+          </button>
         </div>
       </div>
     </div>

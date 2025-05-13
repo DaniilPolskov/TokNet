@@ -15,39 +15,32 @@ class CryptoCurrency(models.Model):
     def __str__(self):
         return f"{self.name} ({self.symbol}) - ${self.price}"
     
+
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email_or_phone, password=None, **extra_fields):
-        if not email_or_phone:
-            raise ValueError('The Email or Phone must be set')
-        user = self.model(email_or_phone=email_or_phone, **extra_fields)
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email_or_phone, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email_or_phone, password, **extra_fields)
-    
+        return self.create_user(email, password, **extra_fields)
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email_or_phone = models.CharField(max_length=100, unique=True)
-    username = models.CharField(max_length=100, default='NewUser')
+    
+    email = models.EmailField(max_length=100, unique=True)
+    username = models.CharField(max_length=100, default='New User')
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
 
-    last_seen = models.DateTimeField(null=True, blank=True)
-
-    address = models.TextField(null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
-
-    show_location = models.BooleanField(default=True)
-    show_day_month_birthdate = models.BooleanField(default=True)
-    show_year_birthdate = models.BooleanField(default=True)
-    kyc_completed = models.BooleanField(default=False)
-
-    transaction_count = models.PositiveIntegerField(default=0)
-    lot_quantity = models.PositiveIntegerField(default=0)
+    address = models.TextField(null=True, blank=True)
 
     profile_picture = models.ImageField(
         upload_to='profile_pics/',
@@ -56,13 +49,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default='profile_pics/default.svg'
     )
 
+    kyc_completed = models.BooleanField(default=False)
+    transaction_count = models.PositiveIntegerField(default=0)
+    lot_quantity = models.PositiveIntegerField(default=0)
+
+    is_2fa_enabled = models.BooleanField(default=False)
+    totp_secret = models.CharField(max_length=32, blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email_or_phone'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.email_or_phone
+        return f"{self.username} ({self.email})"

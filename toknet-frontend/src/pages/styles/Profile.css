@@ -483,6 +483,27 @@
   color: #999;
 }
 
+.rating-level {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.rating {
+  font-size: 1rem;
+  color: gold;
+}
+
+.level {
+  background-color: #4b4b4b;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }

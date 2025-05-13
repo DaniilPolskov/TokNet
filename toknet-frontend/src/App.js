@@ -12,6 +12,8 @@ import TransactionHistory from './pages/TransactionHistory.js';
 import UserLevel from './pages/UserLevel.js';
 import FAQ from './pages/FAQ.js';
 import UserProfile from './pages/UserProfile';
+import Enable2FA from './components/Enable2FA';
+
 import './global.css';
 import './App.css';
 
@@ -97,6 +99,10 @@ function App() {
             
             <Route path="/profile/Level"
             element={<UserLevel />} />
+            
+            <Route path="/profile/edit/enable2FA"
+            element={<Enable2FA />} />
+
           </Routes>
         </main>
       </div>

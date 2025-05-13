@@ -1,3 +1,7 @@
+from base64 import b64encode
+import io
+import pyotp
+import qrcode
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -9,7 +13,7 @@ from .models import CryptoCurrency, CustomUser
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import requests
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 
 class ProfileUpdateView(APIView):
@@ -51,7 +55,32 @@ def user_detail(request, user_id):
 
 class LoginView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
-    
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get("email")
+        password = request.data.get("password")
+        code = request.data.get("code")
+
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        if not user.check_password(password):
+            return Response({"error": "Invalid credentials"}, status=401)
+
+        if user.is_2fa_enabled:
+            if not code:
+                return Response({"requires_2fa": True}, status=200)
+
+            totp = pyotp.TOTP(user.totp_secret)
+            if not totp.verify(code):
+                return Response({"error": "Invalid 2FA code"}, status=401)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=200)
+            
 def get_crypto_data(request):
     cryptos = CryptoCurrency.objects.all()
     ids = ','.join([crypto.coingecko_id for crypto in cryptos])
@@ -99,3 +128,65 @@ def profile_view(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_qr_code(request):
+    user = request.user
+
+    if not user.totp_secret:
+        user.totp_secret = pyotp.random_base32()
+        user.save()
+
+    totp = pyotp.TOTP(user.totp_secret)
+    uri = totp.provisioning_uri(name=user.email, issuer_name="Toknet")
+
+    img = qrcode.make(uri)
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    qr_code_base64 = b64encode(buffer.getvalue()).decode()
+
+    return Response({
+        "qr_code_url": f"data:image/png;base64,{qr_code_base64}"
+    })
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def verify_2fa(request):
+    user = request.user
+    code = request.data.get("code")
+    if not code:
+        return Response({"error": "Code is required"}, status=400)
+
+    if not user.totp_secret:
+        return Response({"error": "2FA not initialized"}, status=400)
+
+    totp = pyotp.TOTP(user.totp_secret)
+    if totp.verify(code):
+        user.is_2fa_enabled = True
+        user.save()
+        return Response({"message": "2FA successfully enabled"})
+    else:
+        return Response({"error": "Invalid code"}, status=400)
+    
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def disable_2fa(request):
+    user = request.user
+    user.is_2fa_enabled = False
+    user.totp_secret = None
+    user.save()
+    return Response({"message": "2FA отключена."})
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_2fa_enabled(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+
+    try:
+        user = CustomUser.objects.get(email=email)
+        return Response({"is_2fa_enabled": user.is_2fa_enabled})
+    except CustomUser.DoesNotExist:
+        return Response({"is_2fa_enabled": False})

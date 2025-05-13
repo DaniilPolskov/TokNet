@@ -1,3 +1,4 @@
+import pyotp
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -11,44 +12,46 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email_or_phone', 'password', 'code')
+        fields = ('email', 'password', 'code')
 
     def create(self, validated_data):
         validated_data.pop('code', None)
         user = User.objects.create_user(
-            email_or_phone=validated_data['email_or_phone'],
+            email=validated_data['email'],
             password=validated_data['password'],
         )
         return user
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        token['email_or_phone'] = user.email_or_phone
-        return token
-
     def validate(self, attrs):
+        user = User.objects.filter(email=attrs['email']).first()
+
+        if user and user.is_2fa_enabled:
+            code = self.context['request'].data.get('code')
+            if not code:
+                raise serializers.ValidationError("2FA код обязателен.")
+
+            totp = pyotp.TOTP(user.totp_secret)
+            if not totp.verify(code):
+                raise serializers.ValidationError("Неверный 2FA код.")
+
         data = super().validate(attrs)
-        data['email_or_phone'] = self.user.email_or_phone
+        data['email'] = self.user.email
         return data
-    
+        
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
 
     class Meta:
         model = User
         fields = (
-            'username', 'first_name', 'last_name', 'date_of_birth',
-            'address', 'profile_picture',
-            'show_location', 'show_day_month_birthdate', 'show_year_birthdate',
-            'kyc_completed', 'transaction_count', 'lot_quantity'
-            
+            'email', 'username', 'first_name', 'last_name',
+            'date_of_birth', 'address', 'profile_picture',
+            'kyc_completed', 'transaction_count', 'lot_quantity',
+            'is_2fa_enabled'
         )
+        read_only_fields = ('email', 'is_2fa_enabled')
 
-    def get_is_online(self, obj):
-        return obj.is_online()
-    
     def update(self, instance, validated_data):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
