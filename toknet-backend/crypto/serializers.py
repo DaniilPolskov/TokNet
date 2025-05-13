@@ -45,9 +45,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data = super().validate(attrs)
         data['email'] = self.user.email
         return data
-<<<<<<< HEAD
         
-=======
     
 class WalletSerializer(serializers.ModelSerializer):
     class Meta:
@@ -55,7 +53,6 @@ class WalletSerializer(serializers.ModelSerializer):
         fields = ('currency', 'currency_name', 'balance', 'price_change_24h')
 
 
->>>>>>> feature/swap-page
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
 
@@ -75,8 +72,6 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-<<<<<<< HEAD
-=======
 class ExchangeOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExchangeOrder
@@ -104,4 +99,3 @@ class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = '__all__'
->>>>>>> feature/swap-page
