@@ -13,6 +13,9 @@ import UserLevel from './pages/UserLevel.js';
 import FAQ from './pages/FAQ.js';
 import UserProfile from './pages/UserProfile';
 import Enable2FA from './components/Enable2FA';
+import CryptoExchangePage from './components/CryptoExchange';
+import ExchangeStep2 from './components/ExchangeStep2';
+import OrderCancelled from './components/OrderCancelled';
 
 import './global.css';
 import './App.css';
@@ -95,14 +98,26 @@ function App() {
             element={<TransactionHistory />} 
             />
             <Route path="/profile/faq" 
-            element={<FAQ />} />
-            
+            element={<FAQ />} 
+            />
+
             <Route path="/profile/Level"
             element={<UserLevel />} />
             
             <Route path="/profile/edit/enable2FA"
             element={<Enable2FA />} />
-
+            
+            <Route path="/exchange" 
+            element={<CryptoExchangePage />} 
+            />
+            
+            <Route path="/exchange/step2"
+            element={<ExchangeStep2 />} 
+            />
+            
+            <Route path="/order-cancelled" 
+            element={<OrderCancelled />} 
+            />
           </Routes>
         </main>
       </div>

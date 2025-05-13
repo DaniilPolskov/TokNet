@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 from .views import RegisterView, LoginView, ProfileUpdateView, get_transactions, profile_view, get_qr_code, verify_2fa, disable_2fa, check_2fa_enabled
+from .views import CompleteOrderView, CancelOrderView, ExchangeCreateView, OrderStatusView, RegisterView, LoginView, ProfileUpdateView, profile_view, wallet_view
 
 urlpatterns = [
     path('crypto-data/', views.get_crypto_data, name='crypto-data'),
@@ -15,4 +16,9 @@ urlpatterns = [
     path('2fa/verify/', verify_2fa),
     path('2fa/disable/', disable_2fa),
     path('2fa/check/', check_2fa_enabled),
+    path('wallets/', wallet_view, name='wallets'),
+    path('exchange/create/', ExchangeCreateView.as_view(), name='create-exchange'),
+    path('exchange/order/<str:order_id>/', OrderStatusView.as_view(), name='order-status'),
+    path('exchange/complete/<str:order_id>/', CompleteOrderView.as_view(), name='complete-order'),
+    path('exchange/cancel/<str:order_id>/', CancelOrderView.as_view(), name='cancel-order'),
 ]
