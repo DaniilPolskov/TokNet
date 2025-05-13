@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import "./styles/Profile.css";
-
-const mockTransactions = [
-  { id: 1, type: "Deposit", amount: 250, currency: "USDT", timestamp: "2025-05-05T12:00:00Z", status: "Completed", note: "Bank transfer" },
-  { id: 2, type: "Withdrawal", amount: 50, currency: "BTC", timestamp: "2025-05-04T15:30:00Z", status: "Pending", note: "To external wallet" },
-  { id: 3, type: "Trade", amount: 100, currency: "ETH", timestamp: "2025-05-03T10:15:00Z", status: "Completed", note: "Bought ETH with USDT" },
-  { id: 4, type: "Deposit", amount: 500, currency: "USDT", timestamp: "2025-05-01T09:00:00Z", status: "Completed", note: "Card deposit" },
-];
-
+import axios from 'axios';
 const TransactionsPage = () => {
   const [transactions, setTransactions] = useState([]);
   const [filteredType, setFilteredType] = useState("All");
 
   useEffect(() => {
-    setTransactions(mockTransactions);
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get('/api/transactions/'); 
+        setTransactions(response.data);
+      } catch (error) {
+        console.error("Error fetching transactions", error);
+      }
+    };
+
+    fetchTransactions();
   }, []);
 
   const types = ["All", "Deposit", "Withdrawal", "Trade"];

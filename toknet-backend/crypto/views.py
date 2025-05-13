@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, TransactionSerializer, UserSerializer
 from .models import CryptoCurrency, CustomUser
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -190,3 +190,11 @@ def check_2fa_enabled(request):
         return Response({"is_2fa_enabled": user.is_2fa_enabled})
     except CustomUser.DoesNotExist:
         return Response({"is_2fa_enabled": False})
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_transactions(request):
+    user = request.user
+    transactions = user.transactions.all()
+    serializer = TransactionSerializer(transactions, many=True)
+    return Response(serializer.data)

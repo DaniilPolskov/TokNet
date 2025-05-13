@@ -69,7 +69,7 @@ const Enable2FA = () => {
       );
 
       alert("2FA отключена.");
-      window.location.reload(); // или можно обновить `is2FAEnabled`
+      window.location.reload();
     } catch (err) {
       alert("Ошибка при отключении 2FA.");
     }

@@ -1,3 +1,4 @@
+from gettext import translation
 import pyotp
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
@@ -21,6 +22,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         return user
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = translation
+        fields = ['id', 'type', 'amount', 'currency', 'timestamp', 'status', 'note']
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -57,3 +63,4 @@ class UserSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+    

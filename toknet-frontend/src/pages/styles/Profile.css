@@ -11,9 +11,8 @@
   flex-direction: column;
   gap: 2rem;
   font-family: 'Urbanist', sans-serif;
-  padding-bottom: 100px;
   position: relative;
-  min-height: 100vh;
+  min-height: calc(100vh - 200px);
 }
 
 .profile-header {
@@ -40,13 +39,8 @@
   color: #121212;
 }
 
-
 .user-info {
   flex: 1;
-}
-
-.nickname-status {
-  margin-bottom: 1rem;
 }
 
 .username {
@@ -54,31 +48,6 @@
   font-weight: 500;
   color: #FFFFFF;
 }
-
-.user-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #262626;
-}
-
-.status-indicator {
-  color: #4CAF50;
-  font-size: 1rem;
-}
-
-.divider {
-  width: 1px;
-  height: 0.75rem;
-  background-color: #6B6B6B;
-}
-
-.location-block .location {
-  font-size: 1rem;
-  color: #9E9E9E;
-}
-
 
 .favorite-tokens {
   display: flex;
@@ -262,28 +231,19 @@
   min-width: 0;
 }
 
+.action-button:hover {
+  background-color: #262626;
+}
+
+.action-button:active {
+  transform: scale(0.98);
+}
 
 .user-info-container {
   display: flex;
   flex-direction: column;
   gap: 0rem;
   width: 35%;
-}
-
-.user-status-block,
-.online-status-block,
-.location-wrapper,
-.favorite-tokens-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border: 1px solid #262626;
-  padding: 1rem;
-  border-radius: 1rem;
-  background-color: transparent;
-  font-family: 'Urbanist', sans-serif;
-  font-weight: 500;
-  color: #ffffff;
 }
 
 .info-block-wrapper {
@@ -308,68 +268,77 @@
   gap: 0.5rem;
 }
 
-.favorite-tokens-block {
+.rating-level {
   display: flex;
-  gap: 0.5rem;
-}
-
-.status-wrapper {
-  display: flex;
+  gap: 12px;
   align-items: center;
-  gap: 0.5rem;
+  margin-top: 4px;
 }
 
-.action-button:hover {
-  background-color: #262626;
+.rating {
+  font-size: 1rem;
+  color: gold;
 }
 
-.action-button:active {
-  transform: scale(0.98);
-}
-
-.kyc-container {
-  max-width: 500px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #1a1a1a;
+.level {
+  background-color: #4b4b4b;
   color: white;
-  border-radius: 1rem;
-  font-family: 'Urbanist', sans-serif;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
 }
 
-.kyc-step {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+.faq-title {
+  color: white;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.kyc-step input {
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #444;
-  background-color: #121212;
-  color: white;
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.kyc-buttons {
+.faq-item {
+  background-color: #1A1A1A;
+  border: 1px solid #262626;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.faq-question {
+  width: 100%;
+  background: none;
+  border: none;
+  color: white;
+  text-align: left;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
-  margin-top: 1rem;
+  align-items: center;
 }
 
-.kyc-buttons button {
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.5rem;
-  border: none;
-  background-color: #141414;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.kyc-buttons button:hover {
+.faq-question:hover {
   background-color: #262626;
+}
+
+.faq-answer {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #CCCCCC;
+  border-top: 1px solid #333;
+  animation: fadeIn 0.3s ease;
+}
+
+.faq-arrow {
+  font-size: 1rem;
+  margin-left: 1rem;
+  color: #999;
 }
 
 .transaction-header {
@@ -425,83 +394,11 @@
   color: white;
   border-color: #262626;
 }
+
 .no-transactions {
   text-align: center;
   margin-top: 20px;
   color: #777;
-}
-
-.faq-title {
-  color: white;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.faq-item {
-  background-color: #1A1A1A;
-  border: 1px solid #262626;
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-.faq-question {
-  width: 100%;
-  background: none;
-  border: none;
-  color: white;
-  text-align: left;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.faq-question:hover {
-  background-color: #262626;
-}
-
-.faq-answer {
-  padding: 1rem;
-  font-size: 0.95rem;
-  color: #CCCCCC;
-  border-top: 1px solid #333;
-  animation: fadeIn 0.3s ease;
-}
-
-.faq-arrow {
-  font-size: 1rem;
-  margin-left: 1rem;
-  color: #999;
-}
-
-.rating-level {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 4px;
-}
-
-.rating {
-  font-size: 1rem;
-  color: gold;
-}
-
-.level {
-  background-color: #4b4b4b;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: bold;
-  font-size: 0.9rem;
 }
 
 @keyframes fadeIn {
@@ -522,5 +419,25 @@
   .action-button {
     width: 100%;
     height: auto;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-info-container {
+    width: 100%;
+  }
+
+  .stats-container {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .transaction-header,
+  .transaction-row-data {
+    grid-template-columns: 1fr;
   }
 }

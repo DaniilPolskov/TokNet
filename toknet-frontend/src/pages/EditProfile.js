@@ -9,10 +9,10 @@ const EditProfile = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState(""); // Добавляем состояние для текущего пароля
+  const [currentPassword, setCurrentPassword] = useState("");
   const [avatarUrl, setAvatarUrl] = useState(null);
-  const [is2FAEnabled, setIs2FAEnabled] = useState(false); // Состояние для 2FA
-  const [isLoading, setIsLoading] = useState(true); // Состояние загрузки данных
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -34,13 +34,13 @@ const EditProfile = () => {
         setUsername(user.username || "");
         setEmail(user.email || "");
         setAvatarUrl(user.profile_picture);
-        setIs2FAEnabled(user.is_2fa_enabled); // Устанавливаем состояние для 2FA
+        setIs2FAEnabled(user.is_2fa_enabled);
       } catch (err) {
         console.error("Ошибка загрузки профиля:", err);
         alert("Ошибка загрузки профиля.");
         navigate("/login");
       } finally {
-        setIsLoading(false); // Завершаем загрузку
+        setIsLoading(false);
       }
     };
 
@@ -62,7 +62,7 @@ const EditProfile = () => {
         formData.append("password", password);
       }
       if (currentPassword) {
-        formData.append("current_password", currentPassword); // Добавляем текущий пароль
+        formData.append("current_password", currentPassword);
       }
 
       await axios.put("http://localhost:8000/api/profile/update/", formData, {
@@ -97,7 +97,7 @@ const EditProfile = () => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/2fa/disable/",  // Используем правильный URL для отключения
+        "http://localhost:8000/api/2fa/disable/",
         {},
         {
           headers: {
@@ -106,7 +106,7 @@ const EditProfile = () => {
         }
       );
 
-      setIs2FAEnabled(false); // Отключаем 2FA в UI
+      setIs2FAEnabled(false);
       alert("2FA отключена.");
     } catch (err) {
       console.error("Ошибка при отключении 2FA:", err);
@@ -155,7 +155,7 @@ const EditProfile = () => {
             <input
               type="password"
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)} // Добавляем обработку изменения для текущего пароля
+              onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Введите текущий пароль"
             />
           </div>
