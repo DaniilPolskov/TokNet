@@ -47,17 +47,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
-    
-class Wallet(models.Model):
-    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, related_name='wallets')
-    currency = models.CharField(max_length=10)
-    currency_name = models.CharField(max_length=100)
-    balance = models.DecimalField(max_digits=20, decimal_places=8)
-    price_change_24h = models.FloatField(default=0)
-    
-    def __str__(self):
-        return f"{self.user.username}'s {self.currency} wallet"
-        
+            
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     
@@ -94,18 +84,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return f"{self.username} ({self.email})"
 
-class Transaction(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="transactions")
-    type = models.CharField(max_length=50)
-    amount = models.FloatField()
-    currency = models.CharField(max_length=10)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=50)
-    note = models.TextField()
-
-    def __str__(self):
-        return f"{self.type} {self.amount} {self.currency} ({self.timestamp})"
-        return self.email
 
 class ExchangeOrder(models.Model):
     STATUS_CHOICES = [
@@ -151,10 +129,3 @@ class ExchangeOrder(models.Model):
             self.save()
             return True
         return False
-    
-class Transaction(models.Model):
-    order = models.ForeignKey(ExchangeOrder, on_delete=models.CASCADE)
-    tx_hash = models.CharField(max_length=100, unique=True)
-    amount = models.DecimalField(max_digits=20, decimal_places=8)
-    confirmations = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)

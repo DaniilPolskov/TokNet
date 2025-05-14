@@ -2,7 +2,7 @@ from base64 import b64encode
 import io
 import pyotp
 import qrcode
-from datetime import time
+from datetime import time, timezone
 import threading
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,13 +10,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, TransactionSerializer, UserSerializer
+from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
 from .models import CryptoCurrency, CustomUser
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import requests
-from .serializers import ExchangeOrderSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer, WalletSerializer
-from .models import CryptoCurrency, CustomUser, ExchangeOrder, Wallet
+from .serializers import ExchangeOrderSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
+from .models import CryptoCurrency, CustomUser, ExchangeOrder
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 import requests
@@ -231,21 +231,22 @@ def check_2fa_enabled(request):
     except CustomUser.DoesNotExist:
         return Response({"is_2fa_enabled": False})
     
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_transactions(request):
+@api_view(['GET', 'PUT'])
+@parser_classes([MultiPartParser, FormParser])
+def profile_view(request):
     user = request.user
-    transactions = user.transactions.all()
-    serializer = TransactionSerializer(transactions, many=True)
-    return Response(serializer.data)
-def wallet_view(request):
-    if not request.user.is_authenticated:
-        return Response({'detail': 'Authentication required'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    wallets = Wallet.objects.filter(user=request.user)
-    serializer = WalletSerializer(wallets, many=True)
-    return Response(serializer.data)
 
+    if request.method == 'GET':
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 def startStatusPolling(order_id):
     interval = 100
     while True:
@@ -263,8 +264,11 @@ class ExchangeCreateView(APIView):
         if serializer.is_valid():
             order = serializer.save(user=request.user)
 
-            polling_thread = threading.Thread(target=startStatusPolling, args=(order.order_id,))
-            polling_thread.start()
+            try:
+                polling_thread = threading.Thread(target=startStatusPolling, args=(order.order_id,))
+                polling_thread.start()
+            except Exception as e:
+                return Response({'error': f'Polling thread failed: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response({
                 'order_id': order.order_id,
@@ -272,7 +276,7 @@ class ExchangeCreateView(APIView):
                 'expires_at': order.expires_at
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+        
 class OrderStatusView(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -308,3 +312,11 @@ class CancelOrderView(APIView):
         order.save()
         
         return Response({'status': 'order cancelled'})
+    
+class ExchangeOrderHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        orders = ExchangeOrder.objects.filter(user=request.user).order_by('-created_at')
+        serializer = ExchangeOrderSerializer(orders, many=True)
+        return Response(serializer.data)

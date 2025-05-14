@@ -1,9 +1,8 @@
-from gettext import translation
 import pyotp
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from crypto.models import Wallet, Transaction, ExchangeOrder
+from crypto.models import ExchangeOrder
 
 
 User = get_user_model()
@@ -17,17 +16,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'password', 'code')
 
     def create(self, validated_data):
-        validated_data.pop('code', None)
         user = User.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
         )
         return user
-
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = translation
-        fields = ['id', 'type', 'amount', 'currency', 'timestamp', 'status', 'note']
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
@@ -46,12 +39,6 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['email'] = self.user.email
         return data
         
-    
-class WalletSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Wallet
-        fields = ('currency', 'currency_name', 'balance', 'price_change_24h')
-
 
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
@@ -86,16 +73,11 @@ class ExchangeOrderSerializer(serializers.ModelSerializer):
         order = ExchangeOrder(**validated_data)
         order.receive_amount = order.calculate_receive_amount()
         order.save()
-        return order\
-        
+        return order        
+    
     def validate(self, data):
         if data['from_currency'] == data['to_currency']:
             raise serializers.ValidationError("From and To currencies must be different.")
         if data['amount'] <= 0:
             raise serializers.ValidationError("Amount must be greater than zero.")
         return data   
-                        
-class TransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transaction
-        fields = '__all__'

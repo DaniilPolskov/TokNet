@@ -6,7 +6,6 @@ import './styles/Profile.css';
 const Profile = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [wallets, setWallets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,16 +29,6 @@ const Profile = () => {
         }
 
         setUser(profileResponse.data);
-
-        const walletResponse = await axios.get('http://localhost:8000/api/wallets/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          }
-        });
-
-        if (walletResponse.data && walletResponse.data.length > 0) {
-          setWallets(walletResponse.data);
-        }
 
       } catch (err) {
         console.error('Profile load error:', err);
@@ -127,7 +116,7 @@ const Profile = () => {
   return (
     <div className="profile-container">
       <div className="profile-header">
-        <div class="avatar-preview">
+        <div className="avatar-preview">
           {user.profile_picture ? (
             <img
               src={user.profile_picture || '/images/default.svg'}
@@ -164,15 +153,6 @@ const Profile = () => {
               </div>
             )}
 
-            {wallets.length > 0 && (
-              <div className="info-block token-list">
-                {wallets.map(wallet => (
-                  <span key={wallet.currency} className={`token-badge token-${wallet.currency.toLowerCase()}`}>
-                    {wallet.currency}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -187,26 +167,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-
-      {wallets.length > 0 && (
-        <div className="wallet-section">
-          <div className="wallet-header">
-            <h3 className="wallet-title">Your wallet:</h3>
-            <button className="view-all-button">View all</button>
-          </div>
-          <div className="wallet-cards">
-            {wallets.map(wallet => (
-              <div key={wallet.currency} className="wallet-card">
-                <div className="currency-name">{wallet.currency_name} ({wallet.currency})</div>
-                <div className="currency-balance">{wallet.balance}</div>
-                <div className={`pnl ${getPnlClass(wallet.price_change_24h)}`}>
-                  {wallet.price_change_24h > 0 ? '+' : ''}{wallet.price_change_24h}% PnL
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="actions-section-container">
         <div className="actions-section">

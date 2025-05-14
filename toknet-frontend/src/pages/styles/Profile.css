@@ -380,7 +380,7 @@
   color: #ffffff;
   font-family: 'Urbanist', sans-serif;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -441,3 +441,80 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Transactions Section Styling  */
+
+.transaction-header {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) 2fr;
+  background-color: #1A1A1A;
+  border: 1px solid #262626;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  color: #CCCCCC;
+  margin-top: 1rem;
+}
+
+.transaction-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr) 2fr;
+  background-color: #1A1A1A;
+  border: 1px solid #262626;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  margin-top: 0.5rem;
+  color: #E0E0E0;
+  font-size: 0.9rem;
+}
+
+.transaction-row > div {
+  padding-right: 1rem;
+  overflow-wrap: break-word;
+  font-size: 15px;
+  font-family: 'Urbanist', sans-serif;;
+}
+
+.details-column {
+  background-color: #1F1F1F;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid #2E2E2E;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-family: 'Urbanist', sans-serif;
+  color: #DDDDDD;
+}
+
+.details-column div strong {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.no-transactions {
+  text-align: center;
+  margin-top: 2rem;
+  color: #888888;
+  font-size: 1rem;
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+  .transaction-header,
+  .transaction-row {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-row > div,
+  .transaction-header > div {
+    padding-bottom: 0.75rem;
+  }
+
+  .details-column {
+    margin-top: 1rem;
+  }
+}
+

@@ -19,7 +19,7 @@ export default function ExchangeStep2() {
   const from = searchParams.get('from');
   const to = searchParams.get('to');
   const amount = parseFloat(searchParams.get('amount'));
-  const rate = parseFloat(searchParams.get('rate'));
+  const rate = parseFloat(searchParams.get('rate') || '0').toFixed(8);
   const fee = parseFloat(searchParams.get('fee'));
   const receiveAddress = decodeURIComponent(searchParams.get('receiveAddress') || '');
   const network = searchParams.get('network') || '';
@@ -118,24 +118,23 @@ export default function ExchangeStep2() {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(`${process.env.REACT_APP_API_URL}/exchange/create/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          order_id: newOrderId,
-          from_currency: from,
-          to_currency: to,
-          amount,
-          rate,
-          fee,
-          receive_address: receiveAddress,
-          deposit_address: depositAddress,
-          from_network: fromNetwork,
-          to_network: toNetwork
-        }),
-        signal: controller.signal
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            order_id: newOrderId,
+            from_currency: from,
+            to_currency: to,
+            amount,
+            rate,
+            fee,
+            receive_address: receiveAddress,
+            deposit_address: depositAddress,
+            from_network: fromNetwork,
+            to_network: toNetwork
+          }),
       });
 
       clearTimeout(timeoutId);
@@ -419,7 +418,9 @@ export default function ExchangeStep2() {
               </div>
             )}
             
-            <button className="support-btn">🔔 Обратиться в поддержку</button>
+            <button className="support-btn" onClick={() => navigate('/support')}>
+              🔔 Обратиться в поддержку
+            </button>
 
             <button
               className="cancel-btn"

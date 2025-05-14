@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from "react";
 import "./styles/Profile.css";
-import axios from 'axios';
+import axios from "axios";
+
 const TransactionsPage = () => {
   const [transactions, setTransactions] = useState([]);
-  const [filteredType, setFilteredType] = useState("All");
+  const [sortOption, setSortOption] = useState("date_desc");
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await axios.get('/api/transactions/'); 
+        const token = localStorage.getItem("access_token");
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/exchange/history/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setTransactions(response.data);
       } catch (error) {
         console.error("Error fetching transactions", error);
@@ -18,49 +27,104 @@ const TransactionsPage = () => {
     fetchTransactions();
   }, []);
 
-  const types = ["All", "Deposit", "Withdrawal", "Trade"];
+  const toggleSort = (field) => {
+    if (field === "date") {
+      setSortOption((prev) =>
+        prev === "date_desc" ? "date_asc" : "date_desc"
+      );
+    } else if (field === "amount") {
+      setSortOption((prev) =>
+        prev === "amount_desc" ? "amount_asc" : "amount_desc"
+      );
+    } else {
+      setSortOption("status");
+    }
+  };
 
-  const filteredTransactions =
-    filteredType === "All"
-      ? transactions
-      : transactions.filter((tx) => tx.type === filteredType);
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    switch (sortOption) {
+      case "date_desc":
+        return new Date(b.created_at) - new Date(a.created_at);
+      case "date_asc":
+        return new Date(a.created_at) - new Date(b.created_at);
+      case "amount_desc":
+        return parseFloat(b.amount || 0) - parseFloat(a.amount || 0);
+      case "amount_asc":
+        return parseFloat(a.amount || 0) - parseFloat(b.amount || 0);
+      case "status":
+        return a.status.localeCompare(b.status);
+      default:
+        return 0;
+    }
+  });
 
   return (
     <div className="profile-container">
       <h2 className="section-title">Transaction History</h2>
 
       <div className="transaction-filters">
-        {types.map((type) => (
-          <button
-            key={type}
-            className={`filter-button ${filteredType === type ? "active" : ""}`}
-            onClick={() => setFilteredType(type)}
-          >
-            {type}
-          </button>
-        ))}
+        <button
+          className={`filter-button ${
+            sortOption.includes("date") ? "active" : ""
+          }`}
+          onClick={() => toggleSort("date")}
+        >
+          Date {sortOption === "date_desc" ? "↓" : "↑"}
+        </button>
+
+        <button
+          className={`filter-button ${
+            sortOption.includes("amount") ? "active" : ""
+          }`}
+          onClick={() => toggleSort("amount")}
+        >
+          Amount {sortOption === "amount_desc" ? "↓" : "↑"}
+        </button>
+
+        <button
+          className={`filter-button ${sortOption === "status" ? "active" : ""}`}
+          onClick={() => toggleSort("status")}
+        >
+          Status
+        </button>
       </div>
 
       <div className="transaction-header">
-        <div className="transaction-label">Type</div>
-        <div className="transaction-label">Amount</div>
-        <div className="transaction-label">Date</div>
-        <div className="transaction-label">Status</div>
-        <div className="transaction-label">Note</div>
+        <div>Order ID</div>
+        <div>From</div>
+        <div>To</div>
+        <div>Amount</div>
+        <div>Rate</div>
+        <div className="details-column-header">Details</div>
       </div>
 
-      {filteredTransactions.map((tx) => (
-        <div className="transaction-row-data" key={tx.id}>
-          <div className="transaction-cell">{tx.type}</div>
-          <div className="transaction-cell">{tx.amount} {tx.currency}</div>
-          <div className="transaction-cell">{new Date(tx.timestamp).toLocaleString()}</div>
-          <div className="transaction-cell">{tx.status}</div>
-          <div className="transaction-cell">{tx.note}</div>
+      {sortedTransactions.map((order) => (
+        <div className="transaction-row" key={order.order_id}>
+          <div>{order.order_id}</div>
+          <div>{order.from_currency}</div>
+          <div>{order.to_currency}</div>
+          <div>{order.amount}</div>
+          <div>{order.rate}</div>
+          <div className="details-column" style={{ fontFamily: "Urbanist", fontSize: "16px" }}>
+            <div>
+              <strong>Fee:</strong> {order.fee}%
+            </div>
+            <div>
+              <strong>Status:</strong> {order.status}
+            </div>
+            <div>
+              <strong>Receive:</strong> {order.receive_amount}
+            </div>
+            <div>
+              <strong>Created:</strong>{" "}
+              {new Date(order.created_at).toLocaleString()}
+            </div>
+          </div>
         </div>
       ))}
 
-      {filteredTransactions.length === 0 && (
-        <div className="no-transactions">No transactions found for this type.</div>
+      {sortedTransactions.length === 0 && (
+        <div className="no-transactions">No transactions found.</div>
       )}
     </div>
   );
