@@ -1,74 +1,146 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './styles/UserLevel.css';
 
-function AccountInfo() {
+function UserLevel() {
+  const [totalTurnover, setTotalTurnover] = useState(0);
+  const [userLevel, setUserLevel] = useState(0);
+  const [nextLevel, setNextLevel] = useState(1);
+  const [amountToNextLevel, setAmountToNextLevel] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
+
+  const levelsData = [
+    { level: 'LVL 0', volume: 0, swap: '2%' },
+    { level: 'LVL 1', volume: 100, swap: '1.5%' },
+    { level: 'LVL 2', volume: 1000, swap: '1.45%' },
+    { level: 'LVL 3', volume: 3000, swap: '1.4%' },
+    { level: 'LVL 4', volume: 50000, swap: '1.35%' },
+    { level: 'LVL 5', volume: 100000, swap: '1.3%' },
+  ];
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/exchange/history/`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        const transactions = response.data;
+
+        const receivedTransactions = transactions.filter(
+          (transaction) => transaction.status === 'received'
+        );
+
+        let total = 0;
+
+        receivedTransactions.forEach((transaction) => {
+          total += parseFloat(transaction.amount);
+        });
+
+        setTotalTurnover(total);
+
+        const level = calculateUserLevel(total);
+        setUserLevel(level);
+        setNextLevel(level + 1);
+        calculateProgress(level, total);
+        calculateAmountToNextLevel(level, total);
+      })
+      .catch((error) => {
+        console.error('Ошибка при получении данных:', error);
+      });
+  }, []);
+
+  const calculateUserLevel = (total) => {
+    for (let i = levelsData.length - 1; i >= 0; i--) {
+      if (total >= levelsData[i].volume) {
+        return i;
+      }
+    }
+    return 0;
+  };
+
+  const calculateProgress = (level, total) => {
+    const currentLevelVolume = levelsData[level].volume;
+    const nextLevelVolume = levelsData[level + 1]?.volume || levelsData[level].volume;
+
+    if (nextLevelVolume > currentLevelVolume) {
+      const progress = ((total - currentLevelVolume) / (nextLevelVolume - currentLevelVolume)) * 100;
+      setProgress(progress);
+    }
+  };
+
+  const calculateAmountToNextLevel = (level, total) => {
+    const nextLevelVolume = levelsData[level + 1]?.volume || 0;
+    if (nextLevelVolume > total) {
+      setAmountToNextLevel(nextLevelVolume - total);
+    } else {
+      setAmountToNextLevel(0);
+    }
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile', { state: { userLevel } });
+  };
+
   return (
-    <div className="account-info">
-      <h2>Уровень вашего аккаунта</h2>
+    <div className="account-level-card card">
+      <button className="close-button" onClick={handleProfileClick}>
+        &lt;
+      </button>
+
+      <h2 className="card-title">Уровень аккаунта</h2>
+
       <div className="monthly-volume">
-        <span>Ваш месячный объем</span>
+        <span className="label">Ваш оборот</span>
         <div className="volume-box">
-          <span className="amount">0 USDT</span>
+          <span className="amount">{totalTurnover.toFixed(2)} USDT</span>
         </div>
       </div>
+
       <div className="level-progress">
-        <span>0.00 USDT (lvl 0)</span>
-        <span>(lvl 1) 100 USDT</span>
+        <span>
+          Текущий уровень: <strong>(LVL {userLevel}) </strong>
+        </span>
+        <span>
+          Следующий уровень: <strong>(LVL {nextLevel})</strong>
+        </span>
+      </div>
+
+      <div className="progress-bar-container">
+        <div className="progress-bar-background">
+          <div className="progress-bar" style={{ width: `${progress}%` }}></div>
+        </div>
+      </div>
+
+      <div className="amount-to-next-level">
+        <span>Осталось до следующего уровня: </span>
+        <span>{amountToNextLevel.toFixed(2)} USDT</span>
+      </div>
+
+      <h3 className="sub-title">Уровни & Привилегии</h3>
+      <div className="level-cards-grid">
+        {levelsData.map((item, index) => (
+          <div key={index} className="level-card">
+            <div className="level-name">{item.level}</div>
+            <div className="level-detail">
+              <span>Оборот:</span>
+              <span>{item.volume} USDT</span>
+            </div>
+            <div className="level-detail">
+              <span>SWAP:</span>
+              <span>{item.swap}</span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-function LevelTable() {
-    const levelsData = [
-      { level: '0 LVL', volume: '0', swap: '0.6%', usdt: '2.5%', btc: '2.5%' },
-      { level: '1 LVL', volume: '100', swap: '0.5%', usdt: '2.4%', btc: '2.4%' },
-      { level: '2 LVL', volume: '1K', swap: '0.45%', usdt: '2.3%', btc: '2.3%' },
-      { level: '3 LVL', volume: '3K', swap: '0.4%', usdt: '2.2%', btc: '2.2%' },
-      { level: '4 LVL', volume: '50K', swap: '0.35%', usdt: '2%', btc: '2%' },
-      { level: '5 LVL', volume: '100K', swap: '0.3%', usdt: '2%', btc: '2%' },
-      { level: '6 LVL', volume: '500K', swap: '0.25%', usdt: '2%', btc: '2%' },
-    ];
-  
-    return (
-      <div className="level-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Уровень</th>
-              <th>Оборот</th>
-              <th>SWAP</th>
-              <th>USDT</th>
-              <th>BTC</th>
-            </tr>
-          </thead>
-          <tbody>
-            {levelsData.map((levelInfo, index) => (
-              <tr key={index}>
-                <td>{levelInfo.level}</td>
-                <td>{levelInfo.volume}</td>
-                <td>{levelInfo.swap}</td>
-                <td>{levelInfo.usdt}</td>
-                <td>{levelInfo.btc}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  }
-  
-function App() {
-  return (
-    <div className="app-container">
-      <div className="left-section">
-        <AccountInfo />
-      </div>
-      <div className="right-section">
-        <LevelTable />
-      </div>
-    </div>
-  );
-}
-
-export default App;
+export default UserLevel;

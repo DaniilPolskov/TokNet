@@ -143,8 +143,7 @@ const Profile = () => {
               <span className="rating">
                 Rating: {"★".repeat(Math.round(user.rating || 0)).padEnd(5, "☆")}
               </span>
-              <span className="level">LVL {user.level ?? 1}</span>
-            </div>
+              </div>
             </div>
 
             {user.show_location && user.address && (
