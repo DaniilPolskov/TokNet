@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";  // Импортируем useNavigate
 import "./styles/Profile.css";
 import axios from "axios";
 
 const TransactionsPage = () => {
   const [transactions, setTransactions] = useState([]);
   const [sortOption, setSortOption] = useState("date_desc");
+
+  const navigate = useNavigate();  // Инициализируем navigate
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -58,9 +61,18 @@ const TransactionsPage = () => {
     }
   });
 
+  const handleProfileClick = () => {
+    navigate('/profile');  // Используем navigate для перехода на профиль
+  };
+
   return (
     <div className="profile-container">
-      <h2 className="section-title">Transaction History</h2>
+      <div className="profile-header">
+        <button className="close-button" onClick={handleProfileClick}>
+          &lt;  {/* Это будет кнопка для возврата на страницу профиля */}
+        </button>
+        <h2 className="section-title">Transaction History</h2>
+      </div>
 
       <div className="transaction-filters">
         <button

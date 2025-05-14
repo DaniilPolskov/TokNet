@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './styles/Profile.css';
+import { useNavigate } from 'react-router-dom';
 
 const faqData = [
     {
@@ -65,15 +66,25 @@ const faqData = [
       }
   ];
 
+
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const navigate = useNavigate();
 
   const toggleAnswer = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const handleBackToProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <div className="profile-container">
+      <button className="close-button" onClick={handleBackToProfile}>
+        &lt;
+      </button>
+
       <h2 className="faq-title">Часто задаваемые вопросы</h2>
       <div className="faq-list">
         {faqData.map((item, index) => (
@@ -83,9 +94,9 @@ const FAQ = () => {
               <span className="faq-arrow">{openIndex === index ? '▲' : '▼'}</span>
             </button>
             {openIndex === index && (
-            <div className="faq-answer">
+              <div className="faq-answer">
                 {typeof item.answer === 'string' ? item.answer : item.answer}
-            </div>
+              </div>
             )}
           </div>
         ))}
