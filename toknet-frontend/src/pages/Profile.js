@@ -8,6 +8,7 @@ const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [receivedCount, setReceivedCount] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -18,30 +19,30 @@ const Profile = () => {
           throw new Error('Please login to access this page');
         }
 
-        const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          }
-        });
+      const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-        if (!profileResponse.data) {
-          throw new Error('No profile data received');
-        }
+      setUser(profileResponse.data);
 
-        setUser(profileResponse.data);
+      const txResponse = await axios.get('http://localhost:8000/api/exchange/history/', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-      } catch (err) {
-        console.error('Profile load error:', err);
-        setError(err.message);
-        
-        if (err.response?.status === 401) {
-          localStorage.removeItem('access_token');
-          navigate('/login');
-        }
-      } finally {
-        setLoading(false);
+      const received = txResponse.data.filter(tx => tx.status === 'received').length;
+      setReceivedCount(received);
+
+    } catch (err) {
+      console.error('Profile load error:', err);
+      setError(err.message);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('access_token');
+        navigate('/login');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
     fetchUserData();
   }, [navigate]);
@@ -60,16 +61,6 @@ const Profile = () => {
 
   const handleFaqClick = () => {
     navigate('/profile/faq');
-  };
-
-  const formatBirthdate = (dateStr, showDayMonth, showYear) => {
-    const date = new Date(dateStr);
-    const options = {
-      day: showDayMonth ? '2-digit' : undefined,
-      month: showDayMonth ? 'short' : undefined,
-      year: showYear ? 'numeric' : undefined,
-    };
-    return date.toLocaleDateString('en-US', options);
   };
 
   const getPnlClass = (change) => {
@@ -157,8 +148,8 @@ const Profile = () => {
 
         <div className="stats-container">
           <div className="stat-block">
-            <div className="stat-number">{user.transaction_count ?? 0}</div>
-            <div className="stat-label">Transaction count</div>
+           <div className="stat-number">{receivedCount}</div>
+          <div className="stat-label">Transaction count</div>
           </div>
           <div className="stat-block">
             <div className="stat-number">{user.lot_quantity ?? 0}</div>

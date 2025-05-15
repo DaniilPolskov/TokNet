@@ -36,6 +36,16 @@ export default function CryptoExchange() {
   };
 
   useEffect(() => {
+  const storedFee = localStorage.getItem('fee_rate');
+  if (storedFee) {
+    const parsed = parseFloat(storedFee);
+    // Если случайно сохранено в процентах, например 1.3 — преврати в 0.013
+    const corrected = parsed > 1 ? parsed / 100 : parsed;
+    setFeeRate(corrected);
+    console.log("fee_rate из localStorage:", parsed, "=> применено:", corrected);
+}}, []);
+
+  useEffect(() => {
     setNetwork(getNetwork(toCrypto));
   }, [toCrypto]);
 
@@ -72,10 +82,17 @@ export default function CryptoExchange() {
     return num.toFixed(6);
   };
 
-  const outputAmount = exchangeRate && amount
-    ? formatOutputAmount(amount * exchangeRate * (1 - feeRate))
-    : '0';
+let rawAmount = 0;
+let netAmount = 0;
 
+if (exchangeRate && amount) {
+  rawAmount = parseFloat(amount) * exchangeRate;
+  netAmount = rawAmount * (1 - feeRate);
+}
+
+const outputAmount = exchangeRate && amount
+  ? formatOutputAmount(netAmount)
+  : '0';
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -150,7 +167,7 @@ export default function CryptoExchange() {
           <div className="swap-arrows">⇄</div>
         </div>
 
-        <p className="label">You receive</p>
+        <p className="label">You receive (inclusive of fees)</p>
         <div className="input-group">
           <input
             type="text"

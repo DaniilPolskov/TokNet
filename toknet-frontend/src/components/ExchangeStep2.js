@@ -19,8 +19,13 @@ export default function ExchangeStep2() {
   const from = searchParams.get('from');
   const to = searchParams.get('to');
   const amount = parseFloat(searchParams.get('amount'));
-  const rate = parseFloat(searchParams.get('rate') || '0').toFixed(8);
-  const fee = parseFloat(searchParams.get('fee'));
+  const rawRate = parseFloat(searchParams.get('rate') || '0');
+  const rate = rawRate.toFixed(8);
+  const feeParam = searchParams.get('fee');
+  const fee = feeParam !== null
+    ? parseFloat(feeParam)
+    : parseFloat(localStorage.getItem('fee_rate')) || 0.02;
+
   const receiveAddress = decodeURIComponent(searchParams.get('receiveAddress') || '');
   const network = searchParams.get('network') || '';
 
@@ -34,7 +39,7 @@ export default function ExchangeStep2() {
   };
 
   const depositAddress = getDepositAddress();
-  const receiveAmount = (amount * rate * (1 - fee)).toFixed(8);
+  const receiveAmount = (amount * rawRate * (1 - fee)).toFixed(8);
 
   const [showWithAmount, setShowWithAmount] = useState(false);
   const qrValue = showWithAmount
@@ -129,7 +134,7 @@ export default function ExchangeStep2() {
             to_currency: to,
             amount,
             rate,
-            fee,
+            fee: parseFloat(fee.toFixed(4)),
             receive_address: receiveAddress,
             deposit_address: depositAddress,
             from_network: fromNetwork,

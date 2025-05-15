@@ -20,29 +20,60 @@ function UserLevel() {
     { level: 'LVL 5', volume: 100000, swap: '1.3%' },
   ];
 
+  const getFeeRate = (level) => {
+    const levelInfo = levelsData[level];
+    if (!levelInfo) return 0.02;
+    return parseFloat(levelInfo.swap) / 100;
+  };
+
+  useEffect(() => {
+    localStorage.setItem('fee_rate', getFeeRate(userLevel));
+
+    const token = localStorage.getItem('access_token');
+    if (!token) return;
+
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/user/update_fee/`,
+        { fee_rate: getFeeRate(userLevel) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then(() => {
+        console.log('Комиссия успешно обновлена');
+      })
+      .catch((error) => {
+        console.error('Ошибка при обновлении комиссии:', error);
+      });
+  }, [userLevel]);
+
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (!token) return;
 
     axios
       .get(`${process.env.REACT_APP_API_URL}/exchange/history/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         const transactions = response.data;
 
         const receivedTransactions = transactions.filter(
-          (transaction) => transaction.status === 'received'
+          (tx) => tx.status === 'received'
         );
 
         let total = 0;
 
-        receivedTransactions.forEach((transaction) => {
-          total += parseFloat(transaction.amount);
-        });
+        receivedTransactions.forEach((tx) => {
+          const fromCurrency = tx.from_currency?.toUpperCase();
+          const toCurrency = tx.to_currency?.toUpperCase();
 
+          if (fromCurrency === 'USDT') {
+            total += parseFloat(tx.amount) || 0;
+          } else if (toCurrency === 'USDT') {
+            total += parseFloat(tx.receive_amount) || 0;
+          }
+        });
+        
         setTotalTurnover(total);
 
         const level = calculateUserLevel(total);
@@ -58,30 +89,30 @@ function UserLevel() {
 
   const calculateUserLevel = (total) => {
     for (let i = levelsData.length - 1; i >= 0; i--) {
-      if (total >= levelsData[i].volume) {
-        return i;
-      }
+      if (total >= levelsData[i].volume) return i;
     }
     return 0;
   };
 
   const calculateProgress = (level, total) => {
-    const currentLevelVolume = levelsData[level].volume;
-    const nextLevelVolume = levelsData[level + 1]?.volume || levelsData[level].volume;
+    const currentLevelVolume = levelsData[level]?.volume ?? 0;
+    const nextLevelVolume = levelsData[level + 1]?.volume ?? currentLevelVolume;
 
     if (nextLevelVolume > currentLevelVolume) {
-      const progress = ((total - currentLevelVolume) / (nextLevelVolume - currentLevelVolume)) * 100;
-      setProgress(progress);
+      let prog = ((total - currentLevelVolume) / (nextLevelVolume - currentLevelVolume)) * 100;
+
+      if (isNaN(prog) || prog < 0) prog = 0;
+      if (prog > 100) prog = 100;
+
+      setProgress(prog);
+    } else {
+      setProgress(100);
     }
   };
 
   const calculateAmountToNextLevel = (level, total) => {
     const nextLevelVolume = levelsData[level + 1]?.volume || 0;
-    if (nextLevelVolume > total) {
-      setAmountToNextLevel(nextLevelVolume - total);
-    } else {
-      setAmountToNextLevel(0);
-    }
+    setAmountToNextLevel(nextLevelVolume > total ? nextLevelVolume - total : 0);
   };
 
   const handleProfileClick = () => {
@@ -104,12 +135,8 @@ function UserLevel() {
       </div>
 
       <div className="level-progress">
-        <span>
-          Текущий уровень: <strong>(LVL {userLevel}) </strong>
-        </span>
-        <span>
-          Следующий уровень: <strong>(LVL {nextLevel})</strong>
-        </span>
+        <span>Текущий уровень: <strong>(LVL {userLevel})</strong></span>
+        <span>Следующий уровень: <strong>(LVL {nextLevel})</strong></span>
       </div>
 
       <div className="progress-bar-container">
