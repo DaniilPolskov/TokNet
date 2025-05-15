@@ -40,15 +40,20 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
         
 
+class KYCSubmissionSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    id_document_front_url = serializers.URLField()
+    id_document_back_url = serializers.URLField(required=False, allow_blank=True, allow_null=True)
+    selfie_url = serializers.URLField()
+    
 class UserSerializer(serializers.ModelSerializer):
     profile_picture = serializers.ImageField(use_url=True, required=False, allow_null=True)
 
     class Meta:
         model = User
         fields = (
-            'email', 'username', 'first_name', 'last_name',
-            'date_of_birth', 'address', 'profile_picture',
-            'kyc_completed', 'transaction_count', 'lot_quantity',
+            'email', 'username', 'profile_picture',
+            'kyc_submitted', 'transaction_count', 'lot_quantity',
             'is_2fa_enabled'
         )
         read_only_fields = ('email', 'is_2fa_enabled')

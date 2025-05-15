@@ -1,15 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import './styles/Profile.css';
+import axios from 'axios';
 
 const KYCVerification = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    fullName: "",
-    birthDate: "",
-    nationality: "",
-    idDocument: null,
+    email: "",
+    frontIdDocument: null,
+    backIdDocument: null,
     selfie: null,
   });
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+
+        if (!token) {
+          throw new Error('Please login to access this page');
+        }
+
+        const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          }
+        });
+
+        if (!profileResponse.data) {
+          throw new Error('No profile data received');
+        }
+
+        setUser(profileResponse.data);
+        setFormData((prev) => ({ ...prev, email: profileResponse.data.email }));
+
+      } catch (err) {
+        setError(err.message);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('access_token');
+          navigate('/login');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -23,74 +65,157 @@ const KYCVerification = () => {
     if (step < 3) setStep(step + 1);
   };
 
-  const handlePrev = () => {
-    if (step > 1) setStep(step - 1);
+  const uploadToCloudinary = async (file) => {
+    const cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dgnnjctsa/upload';
+    const uploadPreset = 'kyc_uploads';
+
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', uploadPreset);
+
+    try {
+      const response = await axios.post(cloudinaryUrl, data, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      return response.data.secure_url;
+    } catch {
+      return null;
+    }
   };
 
-  const handleSubmit = () => {
-    console.log("Submitting KYC:", formData);
-    alert("KYC submitted successfully!");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      const frontUrl = formData.frontIdDocument ? await uploadToCloudinary(formData.frontIdDocument) : null;
+      const backUrl = formData.backIdDocument ? await uploadToCloudinary(formData.backIdDocument) : null;
+      const selfieUrl = formData.selfie ? await uploadToCloudinary(formData.selfie) : null;
+
+      const kycPayload = {
+        email: formData.email,
+        id_document_front_url: frontUrl,
+        id_document_back_url: backUrl,
+        selfie_url: selfieUrl,
+      };
+
+      const token = localStorage.getItem('access_token');
+
+      await axios.post('http://localhost:8000/api/profile/kyc/submit', kycPayload, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      alert("KYC successfully submitted!");
+      navigate('/profile');
+    } catch (err) {
+      console.error("Submission error:", err);
+      alert("Error submitting KYC. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="spinner"></div>
+        <p>Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <div className="profile-error">
+          <h3>Profile Error</h3>
+          <p>{error}</p>
+          <div className="error-actions">
+            <button onClick={() => window.location.reload()}>Retry</button>
+            <button onClick={() => navigate('/login')}>Login</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="profile-container">
+        <div className="profile-empty">
+          <p>No profile data available</p>
+          <button onClick={() => navigate('/login')}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="kyc-container">
       <h2>KYC Verification - Step {step} of 3</h2>
 
-      {step === 1 && (
-        <div className="kyc-step">
-          <input
-            type="text"
-            name="fullName"
-            placeholder="Full Name"
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-          <input
-            type="date"
-            name="birthDate"
-            placeholder="Date of Birth"
-            value={formData.birthDate}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="nationality"
-            placeholder="Nationality"
-            value={formData.nationality}
-            onChange={handleChange}
-          />
-        </div>
-      )}
+      <form onSubmit={handleSubmit}>
+        {step === 1 && (
+          <div className="kyc-step">
+            <label>Upload front side of your ID card / first page of your passport:</label>
+            <input
+              type="file"
+              name="frontIdDocument"
+              accept="image/*,application/pdf"
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
-      {step === 2 && (
-        <div className="kyc-step">
-          <label>Upload Passport / ID:</label>
-          <input
-            type="file"
-            name="idDocument"
-            accept="image/*,application/pdf"
-            onChange={handleChange}
-          />
-        </div>
-      )}
+        {step === 2 && (
+          <div className="kyc-step">
+            <label>Upload back side of your ID card (if applicable):</label>
+            <input
+              type="file"
+              name="backIdDocument"
+              accept="image/*,application/pdf"
+              onChange={handleChange}
+            />
+            <small> If you have a passport, just click "Next".</small>
+          </div>
+        )}
 
-      {step === 3 && (
-        <div className="kyc-step">
-          <label>Upload Selfie with ID:</label>
-          <input
-            type="file"
-            name="selfie"
-            accept="image/*"
-            onChange={handleChange}
-          />
-        </div>
-      )}
+        {step === 3 && (
+          <div className="kyc-step">
+            <label>Selfie with your ID card / passport:</label>
+            <input
+              type="file"
+              name="selfie"
+              accept="image/*"
+              onChange={handleChange}
+            />
+          </div>
+        )}
 
-      <div className="kyc-buttons">
-        {step > 1 && <button onClick={handlePrev}>Back</button>}
-        {step < 3 && <button onClick={handleNext}>Next</button>}
-        {step === 3 && <button onClick={handleSubmit}>Submit</button>}
-      </div>
+        {step < 3 && (
+          <button 
+            type="button" 
+            onClick={handleNext} 
+            className="kyc-navigate-button"
+            disabled={submitting}
+          >
+            Next
+          </button>
+        )}
+
+        {step === 3 && (
+          <button
+            type="submit"
+            className="kyc-navigate-button"
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : "Submit"}
+          </button>
+        )}
+      </form>
     </div>
   );
 };

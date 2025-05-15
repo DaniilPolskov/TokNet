@@ -89,7 +89,6 @@
     cursor: pointer;
   }
 
-  
   .kyc-button {
     padding: 1rem 2rem;
     border: none;
@@ -100,3 +99,10 @@
     cursor: pointer;
     width: 100%;
   }
+
+  .kyc-button[disabled] {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  
+}

@@ -12,14 +12,15 @@ const EditProfile = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(true)
+  const [kycSubmitted, setKycSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          alert("Вы не авторизованы.");
+          alert("You are not authorized.");
           navigate("/login");
           return;
         }
@@ -35,9 +36,10 @@ const EditProfile = () => {
         setEmail(user.email || "");
         setAvatarUrl(user.profile_picture);
         setIs2FAEnabled(user.is_2fa_enabled);
+        setKycSubmitted(user.kyc_submitted);
       } catch (err) {
-        console.error("Ошибка загрузки профиля:", err);
-        alert("Ошибка загрузки профиля.");
+        console.error("Profile loading error:", err);
+        alert("Profile loading error.");
         navigate("/login");
       } finally {
         setIsLoading(false);
@@ -51,7 +53,7 @@ const EditProfile = () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("Вы не авторизованы.");
+        alert("You are not authorized.");
         return;
       }
 
@@ -72,11 +74,11 @@ const EditProfile = () => {
         },
       });
 
-      alert("Изменения сохранены!");
+      alert("The changes have been saved!");
       navigate("/profile");
     } catch (err) {
-      console.error("Ошибка сохранения:", err);
-      alert("Не удалось сохранить профиль.");
+      console.error("Retention Error:", err);
+      alert("Failed to save profile.");
     }
   };
 
@@ -92,25 +94,19 @@ const EditProfile = () => {
     try {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("Вы не авторизованы.");
+        alert("You are not authorized.");
         return;
       }
 
-      const response = await axios.post(
-        "http://localhost:8000/api/2fa/disable/",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await axios.post("http://localhost:8000/api/2fa/disable/", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setIs2FAEnabled(false);
-      alert("2FA отключена.");
+      alert("2FA deactivated.");
     } catch (err) {
-      console.error("Ошибка при отключении 2FA:", err);
-      alert("Не удалось отключить 2FA.");
+      console.error("Error when disabling 2FA:", err);
+      alert("Failed to disable 2FA.");
     }
   };
 
@@ -156,7 +152,7 @@ const EditProfile = () => {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Введите текущий пароль"
+              placeholder="Enter the current password"
             />
           </div>
 
@@ -166,21 +162,23 @@ const EditProfile = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Оставьте пустым, если не меняете"
+              placeholder="Leave blank if you are not changing"
             />
           </div>
 
           <div className="form-block checkbox-block">
-            <button className="kyc-button" onClick={handleKYC}>
-              Complete KYC
+            <button 
+              className="kyc-button" 
+              onClick={handleKYC} 
+              disabled={kycSubmitted}
+            >
+              {kycSubmitted ? "You've already applied" : "Complete KYC"}
             </button>
           </div>
 
           <div className="form-block checkbox-block">
             {isLoading ? (
-              <button className="kyc-button" disabled>
-                Загрузка...
-              </button>
+              <button className="kyc-button" disabled>Loading...</button>
             ) : is2FAEnabled ? (
               <button className="kyc-button" onClick={handleDisable2FA}>
                 Disable 2FA

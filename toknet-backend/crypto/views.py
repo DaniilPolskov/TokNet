@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
+from .serializers import KYCSubmissionSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
 from .models import CryptoCurrency, CustomUser
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
@@ -246,7 +246,24 @@ def profile_view(request):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def submit_kyc(request):
+    serializer = KYCSubmissionSerializer(data=request.data)
+    if serializer.is_valid():
+        user = request.user
+
+        user.kyc_submitted = True
+        user.save()
+
+        print("KYC Submission Received")
+        print(serializer.validated_data)
+
+        return Response({"message": "KYC submission received", "kyc_submitted": True})
+
+    return Response(serializer.errors, status=400)
+
 def startStatusPolling(order_id):
     interval = 100
     while True:

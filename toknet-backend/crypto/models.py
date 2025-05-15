@@ -53,11 +53,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     
     email = models.EmailField(max_length=100, unique=True)
     username = models.CharField(max_length=100, default='New User')
-    first_name = models.CharField(max_length=100, blank=True)
-    last_name = models.CharField(max_length=100, blank=True)
 
-    date_of_birth = models.DateField(null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
+    kyc_submitted = models.BooleanField(default=False)
 
     profile_picture = models.ImageField(
         upload_to='profile_pics/',
@@ -66,7 +63,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default='profile_pics/default.svg'
     )
 
-    kyc_completed = models.BooleanField(default=False)
     transaction_count = models.PositiveIntegerField(default=0)
     lot_quantity = models.PositiveIntegerField(default=0)
 
