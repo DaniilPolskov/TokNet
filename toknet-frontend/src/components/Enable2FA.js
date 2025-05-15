@@ -13,7 +13,7 @@ const Enable2FA = () => {
     const fetchData = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        alert("Вы не авторизованы.");
+        alert("You are not authorized.");
         navigate("/login");
         return;
       }
@@ -31,8 +31,8 @@ const Enable2FA = () => {
           setQrCodeUrl(response.data.qr_code_url);
         }
       } catch (err) {
-        console.error("Ошибка:", err);
-        alert("Ошибка загрузки данных.");
+        console.error("Error:", err);
+        alert("Failed to load data.");
       }
     };
 
@@ -41,7 +41,7 @@ const Enable2FA = () => {
 
   const handleEnable = async () => {
     const token = localStorage.getItem("access_token");
-    if (!token) return alert("Вы не авторизованы.");
+    if (!token) return alert("You are not authorized.");
 
     try {
       await axios.post(
@@ -50,16 +50,16 @@ const Enable2FA = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("2FA успешно включена!");
+      alert("2FA successfully enabled!");
       navigate("/profile/edit/");
     } catch (err) {
-      alert("Неверный код, попробуйте снова.");
+      alert("Invalid code, please try again.");
     }
   };
 
   const handleDisable = async () => {
     const token = localStorage.getItem("access_token");
-    if (!token) return alert("Вы не авторизованы.");
+    if (!token) return alert("You are not authorized.");
 
     try {
       await axios.post(
@@ -68,46 +68,46 @@ const Enable2FA = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      alert("2FA отключена.");
+      alert("2FA disabled.");
       window.location.reload();
     } catch (err) {
-      alert("Ошибка при отключении 2FA.");
+      alert("Error disabling 2FA.");
     }
   };
 
   return (
     <div className="enable-2fa-container">
       <div className="enable-2fa-card">
-        <h2>{is2FAEnabled ? "Управление 2FA" : "Включение двухфакторной аутентификации"}</h2>
+        <h2>{is2FAEnabled ? "2FA Management" : "Enable Two-Factor Authentication"}</h2>
 
         {is2FAEnabled ? (
           <>
-            <p>2FA уже включена.</p>
+            <p>2FA is already enabled.</p>
             <button className="disable-button" onClick={handleDisable}>
-              Отключить 2FA
+              Disable 2FA
             </button>
           </>
         ) : (
           <>
-            <p>Отсканируйте QR-код в приложении (например, Google Authenticator):</p>
+            <p>Scan the QR code in an app (e.g., Google Authenticator):</p>
             {qrCodeUrl ? (
               <img src={qrCodeUrl} alt="QR Code" className="qr-code-img" />
             ) : (
-              <p>Загрузка QR-кода...</p>
+              <p>Loading QR code...</p>
             )}
 
             <div className="form-block">
-              <label>Введите код из приложения</label>
+              <label>Enter the code from the app</label>
               <input
                 type="text"
                 value={otpCode}
                 onChange={(e) => setOtpCode(e.target.value)}
-                placeholder="6-значный код"
+                placeholder="6-digit code"
               />
             </div>
 
             <button className="enable-button" onClick={handleEnable}>
-              Подтвердить и включить 2FA
+              Confirm and enable 2FA
             </button>
           </>
         )}

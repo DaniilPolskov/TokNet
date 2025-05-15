@@ -39,10 +39,10 @@ function UserLevel() {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(() => {
-        console.log('Комиссия успешно обновлена');
+        console.log('Fee successfully updated');
       })
       .catch((error) => {
-        console.error('Ошибка при обновлении комиссии:', error);
+        console.error('Error updating fee:', error);
       });
   }, [userLevel]);
 
@@ -83,7 +83,7 @@ function UserLevel() {
         calculateAmountToNextLevel(level, total);
       })
       .catch((error) => {
-        console.error('Ошибка при получении данных:', error);
+        console.error('Error fetching data:', error);
       });
   }, []);
 
@@ -125,18 +125,18 @@ function UserLevel() {
         &lt;
       </button>
 
-      <h2 className="card-title">Уровень аккаунта</h2>
+      <h2 className="card-title">Account Level</h2>
 
       <div className="monthly-volume">
-        <span className="label">Ваш оборот</span>
+        <span className="label">Your Turnover</span>
         <div className="volume-box">
           <span className="amount">{totalTurnover.toFixed(2)} USDT</span>
         </div>
       </div>
 
       <div className="level-progress">
-        <span>Текущий уровень: <strong>(LVL {userLevel})</strong></span>
-        <span>Следующий уровень: <strong>(LVL {nextLevel})</strong></span>
+        <span>Current Level: <strong>(LVL {userLevel})</strong></span>
+        <span>Next Level: <strong>(LVL {nextLevel})</strong></span>
       </div>
 
       <div className="progress-bar-container">
@@ -146,17 +146,17 @@ function UserLevel() {
       </div>
 
       <div className="amount-to-next-level">
-        <span>Осталось до следующего уровня: </span>
+        <span>Amount left to next level: </span>
         <span>{amountToNextLevel.toFixed(2)} USDT</span>
       </div>
 
-      <h3 className="sub-title">Уровни & Привилегии</h3>
+      <h3 className="sub-title">Levels & Privileges</h3>
       <div className="level-cards-grid">
         {levelsData.map((item, index) => (
           <div key={index} className="level-card">
             <div className="level-name">{item.level}</div>
             <div className="level-detail">
-              <span>Оборот:</span>
+              <span>Turnover:</span>
               <span>{item.volume} USDT</span>
             </div>
             <div className="level-detail">

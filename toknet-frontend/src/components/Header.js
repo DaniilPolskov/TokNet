@@ -29,8 +29,8 @@ const Header = ({ isAuthenticated, user, onLogout, children }) => {
               {showDropdown && (
                 <div className="dropdown">
                   <span className="dropdown-user">{user?.email || 'User'}</span>
-                  <Link to="/profile" className="dropdown-link">My Profile</Link>
-                  <button onClick={onLogout} className="dropdown-link logout-button">Logout</button>
+                    <Link to="/profile" className="dropdown-link">My Profile</Link>
+                    <button onClick={onLogout} className="logout-button dropdown-link">Logout</button>
                 </div>
               )}
             </div>

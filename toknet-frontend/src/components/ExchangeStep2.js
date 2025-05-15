@@ -289,7 +289,7 @@ export default function ExchangeStep2() {
     return (
       <div className="exchange-loader">
         <div className="loader-box">
-          <p className="loader-text">Создание сделки...</p>
+          <p className="loader-text">Creating transaction...</p>
         </div>
       </div>
     );
@@ -299,8 +299,8 @@ export default function ExchangeStep2() {
     return (
       <div className="exchange-loader">
         <div className="error-box">
-          <p className="error-text">Ошибка при создании сделки: {transactionError}</p>
-          <button onClick={() => window.location.reload()}>Повторить</button>
+          <p className="error-text">Transaction creation error: {transactionError}</p>
+          <button onClick={() => window.location.reload()}>Retry</button>
         </div>
       </div>
     );
@@ -313,7 +313,7 @@ export default function ExchangeStep2() {
           <div className="checkmark-circle">
             <div className="checkmark"></div>
           </div>
-          <div className="success-message">Средства успешно получены!</div>
+          <div className="success-message">Funds received successfully!</div>
         </div>
       )}
 
@@ -322,34 +322,34 @@ export default function ExchangeStep2() {
           <div className="confirmation-phase">
             <div className="spinner"></div>
             <div className="confirmation-text">
-              Ожидаем поступление средств...<br />
-              Как только транзакция появится в сети, вы автоматически перейдёте к следующему шагу.
+              Waiting for funds...<br />
+              Once the transaction appears on the network, you will automatically proceed to the next step.
             </div>
           </div>
         </div>
       ) : showStep3 ? (
         <div className="completed-box">
           <div className="completed-phase">
-            <h2 className="completed-title">Средства получены</h2>
+            <h2 className="completed-title">Funds Received</h2>
             <p className="completed-text">
-              Ваш перевод успешно получен. Ожидайте завершения обработки транзакции.
+              Your transfer has been received. Please wait while we finalize your transaction.
             </p>
             <div className="order-info">
               <div className="info-row">
-                <span>Ордер:</span>
+                <span>Order:</span>
                 <span className="info-value">#{orderId}</span>
               </div>
               <div className="info-row">
-                <span>Сумма:</span>
+                <span>Amount:</span>
                 <span className="info-value">{amount} {from}</span>
               </div>
               <div className="info-row">
-                <span>Получено:</span>
+                <span>Received:</span>
                 <span className="info-value">{receiveAmount} {to}</span>
               </div>
             </div>
             <button className="support-btn" onClick={() => navigate('/profile')}>
-              Перейти в профиль
+              Go to Profile
             </button>
           </div>
         </div>
@@ -357,16 +357,16 @@ export default function ExchangeStep2() {
         <div className="exchange-2-box">
           <div className="exchange-2-left">
             <div className="step-indicator">
-              <span className={`step ${stepPhase === 'deposit' ? 'active' : ''}`}>Ожидание депозита</span>
-              <span className={`step ${stepPhase === 'confirmation' ? 'active' : ''}`}>Ожидание получение средств</span>
-              <span className="step">Отправка средств на ваш адрес</span>
+              <span className={`step ${stepPhase === 'deposit' ? 'active' : ''}`}>Waiting for deposit</span>
+              <span className={`step ${stepPhase === 'confirmation' ? 'active' : ''}`}>Waiting for funds</span>
+              <span className="step">Sending to your address</span>
             </div>
 
-            <label>Отправьте сумму по этому адресу ({fromNetwork}):</label>
+            <label>Send the amount to this address ({fromNetwork}):</label>
             <div className="copy-box">
               <span>{depositAddress}</span>
               <button onClick={() => copyToClipboard(depositAddress)}>
-                <img src={CopyIcon} alt="Скопировать" className="copy-icon" />
+                <img src={CopyIcon} alt="Copy" className="copy-icon" />
               </button>
             </div>
 
@@ -374,25 +374,25 @@ export default function ExchangeStep2() {
               <div className="copy-box">
                 <span>{receiveAmount} {to}</span>
                 <button onClick={() => copyToClipboard(receiveAmount)}>
-                  <img src={CopyIcon} alt="Скопировать" className="copy-icon" />
+                  <img src={CopyIcon} alt="Copy" className="copy-icon" />
                 </button>
               </div>
-              <div className="currency">Валюта: {to} ({toNetwork})</div>
+              <div className="currency">Currency: {to} ({toNetwork})</div>
             </div>
 
             <div className="instruction">
-              Отправьте указанную сумму на кошелёк одним платежом. После появления транзакции в сети, ордер автоматически перейдёт к следующему шагу. Вы можете отправить сумму, отличающуюся от указанной.
+              Send the specified amount to the wallet in one transaction. Once it appears on the network, you will automatically proceed to the next step. You may send a different amount.
             </div>
 
             <div className="support-note">
-              В случае каких-либо вопросов, обращайтесь в поддержку.
+              If you have any questions, please contact support.
             </div>
 
-            <label>Ваши реквизиты ({toNetwork}):</label>
+            <label>Your receiving address ({toNetwork}):</label>
             <div className="info-box">{receiveAddress}</div>
 
             <div className="rate-info">
-              Учитывайте комиссию за перевод + комиссию вашего аккаунта. Комиссия вашего аккаунта: {(fee * 100).toFixed(1)}%
+              Account and transaction fees are applied. Your account fee: {(fee * 100).toFixed(1)}%
             </div>
           </div>
 
@@ -400,38 +400,37 @@ export default function ExchangeStep2() {
             <QRCodeCanvas value={qrValue} className="qr-code" />
             {showWithAmount ? (
               <button className="qr-button" onClick={() => setShowWithAmount(false)}>
-                Показать QR без суммы
+                Show QR without amount
               </button>
             ) : (
               <button className="qr-button" onClick={() => setShowWithAmount(true)}>
-                Показать QR с суммой
+                Show QR with amount
               </button>
             )}
-            <div className="order-id">Ордер #{orderId}</div>
-            <div className="timer">На оплату: {formatTime(timeLeft)}</div>
+            <div className="order-id">Order #{orderId}</div>
+            <div className="timer">Time remaining: {formatTime(timeLeft)}</div>
 
             {showConfirmButton && (
               <div className="confirm-section">
                 <div className="warning-text">
-                  <strong>Внимание!</strong> После нажатия на кнопку вернуться на эту страницу будет невозможно.
-                  Нажимая на кнопку, вы подтверждаете, что уже отправили необходимое количество средств на указанный адрес.
-                  <br />
+                  <strong>Warning!</strong> After confirming, you will not be able to return to this page.
+                  By pressing the button, you confirm that you have already sent the required funds to the specified address.
                 </div>
                 <button className="confirm-btn" onClick={() => setStepPhase('confirmation')}>
-                  Подтвердить отправку
+                  Confirm Sending
                 </button>
               </div>
             )}
             
-            <button className="support-btn" onClick={() => navigate('/support')}>
-              🔔 Обратиться в поддержку
+            <button className="support-btn" onClick={() => navigate('/technical-support')}>
+              🔔 Contact Support
             </button>
 
             <button
               className="cancel-btn"
               onClick={handleCancel}
             >
-              Отменить
+              Cancel
             </button>
           </div>
         </div>

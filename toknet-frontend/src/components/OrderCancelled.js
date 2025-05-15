@@ -8,16 +8,16 @@ export default function OrderCancelled() {
   return (
     <div className="cancelled-wrapper">
       <div className="cancelled-box">
-        <h2>Ордер отменён</h2>
-        <p>Если у вас остались дополнительные вопросы, обратитесь в поддержку</p>
+        <h2>Order Cancelled</h2>
+        <p>If you have any further questions, please contact support</p>
         <button
           className="support-btn"
-          onClick={() => window.open('/support', '_blank')}
+          onClick={() => window.open('/technical-support', '_blank')}
         >
-        Обратиться в поддержку
+        Contact Support
         </button>
         <button className="back-btn" onClick={() => navigate('/')}>
-        Вернуться на главную
+        Return to Homepage
         </button>
       </div>
     </div>

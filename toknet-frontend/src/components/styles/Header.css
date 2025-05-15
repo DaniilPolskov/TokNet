@@ -55,7 +55,7 @@
 }
 
 .profile-icon {
-  font-size: 1.8rem;
+  font-size: 2.6rem;
   color: #fff;
 }
 
@@ -78,15 +78,29 @@
   padding: 0 0.5rem;
 }
 
-.dropdown-link {
+.dropdown-link,
+.logout-button {
   display: block;
-  color: #fff;
-  text-decoration: none;
+  width: 100%;
   padding: 0.4rem 0.8rem;
+  color: #fff;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 0;
+  text-decoration: none;
+  box-sizing: border-box;
+  line-height: 1.5;
+  font-family: inherit;
+  outline: none;
   transition: background-color 0.2s ease;
 }
 
-.dropdown-link:hover {
+.dropdown-link:hover,
+.logout-button:hover {
   background-color: #333;
 }
 
