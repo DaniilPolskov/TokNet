@@ -1,7 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import './styles/Profile.css';
+
+const levelsData = [
+  { level: 'LVL 0', volume: 0, swap: '2%' },
+  { level: 'LVL 1', volume: 100, swap: '1.5%' },
+  { level: 'LVL 2', volume: 1000, swap: '1.45%' },
+  { level: 'LVL 3', volume: 3000, swap: '1.4%' },
+  { level: 'LVL 4', volume: 50000, swap: '1.35%' },
+  { level: 'LVL 5', volume: 100000, swap: '1.3%' },
+];
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -9,65 +18,63 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [receivedCount, setReceivedCount] = useState(0);
+  const [userLevel, setUserLevel] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('access_token');
+        if (!token) throw new Error('Please login to access this page');
 
-        if (!token) {
-          throw new Error('Please login to access this page');
+        const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        setUser(profileResponse.data);
+
+        const txResponse = await axios.get('http://localhost:8000/api/exchange/history/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const receivedTransactions = txResponse.data.filter(tx => tx.status === 'received');
+        setReceivedCount(receivedTransactions.length);
+
+        let total = 0;
+        receivedTransactions.forEach((tx) => {
+          const from = tx.from_currency?.toUpperCase();
+          const to = tx.to_currency?.toUpperCase();
+          if (from === 'USDT') total += parseFloat(tx.amount) || 0;
+          else if (to === 'USDT') total += parseFloat(tx.receive_amount) || 0;
+        });
+
+        const level = calculateUserLevel(total);
+        setUserLevel(level);
+      } catch (err) {
+        console.error('Profile load error:', err);
+        setError(err.message);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('access_token');
+          navigate('/login');
         }
-
-      const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      setUser(profileResponse.data);
-
-      const txResponse = await axios.get('http://localhost:8000/api/exchange/history/', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      const received = txResponse.data.filter(tx => tx.status === 'received').length;
-      setReceivedCount(received);
-
-    } catch (err) {
-      console.error('Profile load error:', err);
-      setError(err.message);
-      if (err.response?.status === 401) {
-        localStorage.removeItem('access_token');
-        navigate('/login');
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
     fetchUserData();
   }, [navigate]);
 
-  const handleEditClick = () => {
-    navigate('/profile/edit');
+  const calculateUserLevel = (total) => {
+    for (let i = levelsData.length - 1; i >= 0; i--) {
+      if (total >= levelsData[i].volume) return i;
+    }
+    return 0;
   };
 
-  const handleHistoryClick = () => {
-    navigate('/profile/transactions');
-  };
-
-  const handleLevelClick = () => {
-    navigate('/profile/level');
-  };
-
-  const handleFaqClick = () => {
-    navigate('/profile/faq');
-  };
-
-  const getPnlClass = (change) => {
-    if (change > 0) return 'positive';
-    if (change < 0) return 'negative';
-    return 'neutral';
-  };
+  const handleEditClick = () => navigate('/profile/edit');
+  const handleHistoryClick = () => navigate('/profile/transactions');
+  const handleLevelClick = () => navigate('/profile/level');
+  const handleFaqClick = () => navigate('/profile/faq');
 
   if (loading) {
     return (
@@ -129,31 +136,29 @@ const Profile = () => {
               <h2 className="username">{user.username}</h2>
             </div>
 
-            <div className="info-block">
-            <div className="rating-level">
-              <span className="rating">
-                Rating: {"★".repeat(Math.round(user.rating || 0)).padEnd(5, "☆")}
-              </span>
-              </div>
-            </div>
-
             {user.show_location && user.address && (
               <div className="info-block">
                 <span className="location">{user.address}</span>
               </div>
             )}
 
+            <div className="info-block">
+              <span><strong>Enable 2FA:</strong> {user.is_2fa_enabled ? 'Yes' : 'No'}</span>
+            </div>
+
+            <div className="info-block">
+              <span><strong>Completed KYC:</strong> {user.kyc_submitted ? 'Yes' : 'No'}</span>
+            </div>
           </div>
         </div>
 
         <div className="stats-container">
           <div className="stat-block">
-           <div className="stat-number">{receivedCount}</div>
-          <div className="stat-label">Transaction count</div>
+            <div className="stat-number">{receivedCount}</div>
+            <div className="stat-label">Transaction count</div>
           </div>
           <div className="stat-block">
-            <div className="stat-number">{user.lot_quantity ?? 0}</div>
-            <div className="stat-label">Lot quantity</div>
+            <div className="stat-number">LVL {userLevel}</div>
           </div>
         </div>
       </div>

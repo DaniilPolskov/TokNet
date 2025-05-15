@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600&display=swap');
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -5,6 +7,14 @@
   padding: 20px 40px;
   background: #101012;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Urbanist', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
 }
 
 .logo {
@@ -125,7 +135,7 @@
 }
 
 .logo-image {
-  width: 60px;
+  width: 223px;
   height: auto;
   margin-left: 40px;
 }

@@ -25,7 +25,7 @@ const Login = ({ onLogin }) => {
         onLogin({ email, token: response.data.access });
       }
     } catch (err) {
-      setError('Неверный логин или пароль');
+      setError('Invalid email or password');
     }
   };
 
@@ -42,13 +42,13 @@ const Login = ({ onLogin }) => {
       localStorage.setItem('access_token', response.data.access);
       onLogin({ email, token: response.data.access });
     } catch (err) {
-      setError('Неверный 2FA код');
+      setError('Invalid 2FA code');
     }
   };
 
   return (
     <div className="auth-form">
-      <h2>Вход</h2>
+      <h2>Login</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={show2FA ? handle2FASubmit : handleInitialLogin}>
         <div className="form-group">
@@ -65,11 +65,11 @@ const Login = ({ onLogin }) => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Пароль</label>
+          <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
-            placeholder="Пароль"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -79,11 +79,11 @@ const Login = ({ onLogin }) => {
 
         {show2FA && (
           <div className="form-group">
-            <label htmlFor="code">2FA код</label>
+            <label htmlFor="code">2FA Code</label>
             <input
               type="text"
               id="code"
-              placeholder="6-значный код"
+              placeholder="6-digit code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
               required
@@ -92,7 +92,7 @@ const Login = ({ onLogin }) => {
         )}
 
         <button type="submit" className="auth-button">
-          {show2FA ? 'Подтвердить 2FA' : 'Войти'}
+          {show2FA ? 'Confirm 2FA' : 'Login'}
         </button>
       </form>
     </div>

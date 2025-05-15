@@ -17,6 +17,7 @@ import TechnicalSupport from './pages/TechnicalSupport.js';
 import CryptoExchangePage from './components/CryptoExchange';
 import ExchangeStep2 from './components/ExchangeStep2';
 import OrderCancelled from './components/OrderCancelled';
+import RulesPage from './pages/RulesPage.js';
 
 import './global.css';
 import './App.css';
@@ -78,7 +79,7 @@ function App() {
               element={<Login onLogin={handleLogin} />} 
             />
             <Route 
-              path="/singup" 
+              path="/register" 
               element={<Register onRegister={handleRegister} />} 
             />
             <Route 
@@ -122,6 +123,10 @@ function App() {
 
             <Route path="/technical-support" 
             element={<TechnicalSupport />} 
+            />
+
+            <Route path="/rules" 
+            element={<RulesPage />} 
             />
 
           </Routes>
