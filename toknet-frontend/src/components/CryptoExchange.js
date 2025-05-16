@@ -39,7 +39,6 @@ export default function CryptoExchange() {
   const storedFee = localStorage.getItem('fee_rate');
   if (storedFee) {
     const parsed = parseFloat(storedFee);
-    // Если случайно сохранено в процентах, например 1.3 — преврати в 0.013
     const corrected = parsed > 1 ? parsed / 100 : parsed;
     setFeeRate(corrected);
     console.log("fee_rate из localStorage:", parsed, "=> применено:", corrected);

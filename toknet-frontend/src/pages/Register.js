@@ -36,7 +36,6 @@ const Register = () => {
         throw new Error(message);
       }
 
-      // No auto-login here
       navigate('/login');
     } catch (err) {
       setError(err.message);

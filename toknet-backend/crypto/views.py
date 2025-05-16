@@ -8,17 +8,11 @@ from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import KYCSubmissionSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
-from .models import CryptoCurrency, CustomUser
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
-import requests
-from .serializers import ExchangeOrderSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
+from django.shortcuts import get_object_or_404
+from .serializers import ExchangeOrderSerializer, KYCSubmissionSerializer, RegisterSerializer, CustomTokenObtainPairSerializer, UserSerializer
 from .models import CryptoCurrency, CustomUser, ExchangeOrder
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
 import requests
 import time
 from rest_framework.decorators import api_view, parser_classes, permission_classes

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import emailjs from 'emailjs-com';
-import axios from 'axios';
 import './styles/TechnicalSupport.css';
 
 const TechnicalSupport = () => {
@@ -9,24 +8,9 @@ const TechnicalSupport = () => {
   const [userEmail, setUserEmail] = useState('');
   const [showToast, setShowToast] = useState(false);
 
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await axios.get('http://localhost:8000/api/profile/', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setUserEmail(response.data.email);
-      } catch (err) {
-        console.error('Failed to fetch user email', err);
-      }
-    };
-    fetchUserEmail();
-  }, []);
-
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!reason || !message) {
+    if (!reason || !message || !userEmail) {
       alert('Please fill all fields');
       return;
     }
@@ -47,6 +31,7 @@ const TechnicalSupport = () => {
       setShowToast(true);
       setReason('');
       setMessage('');
+      setUserEmail('');
       setTimeout(() => setShowToast(false), 3000);
     }).catch((err) => {
       console.error('Email send error:', err);
@@ -59,6 +44,15 @@ const TechnicalSupport = () => {
       <form className="support-box" onSubmit={handleSubmit}>
         <h2 className="support-title">Contact Support</h2>
 
+        <label>Email</label>
+        <input
+          type="email"
+          value={userEmail}
+          onChange={(e) => setUserEmail(e.target.value)}
+          placeholder="Your email"
+          required
+        />
+
         <label>Reason</label>
         <select value={reason} onChange={(e) => setReason(e.target.value)} required>
           <option value="">Select reason</option>
@@ -68,28 +62,28 @@ const TechnicalSupport = () => {
           <option value="Other">Other</option>
         </select>
 
-      <label className="support-label">Message</label>
-      <textarea
-        className="support-text"
-        rows="6"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Describe your issue..."
-        required
-      />
+        <label className="support-label">Message</label>
+        <textarea
+          className="support-text"
+          rows="6"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Describe your issue..."
+          required
+        />
 
-      <button type="submit" className="submit-support-btn">
-        Send
-      </button>
-    </form>
+        <button type="submit" className="submit-support-btn">
+          Send
+        </button>
+      </form>
 
-    {showToast && (
-      <div className="success-toast">
-        <span>Message sent successfully!</span>
-      </div>
-    )}
-  </div>
-);
-}
+      {showToast && (
+        <div className="success-toast">
+          <span>Message sent successfully!</span>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default TechnicalSupport;
