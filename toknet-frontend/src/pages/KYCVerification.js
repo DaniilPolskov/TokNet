@@ -16,6 +16,7 @@ const KYCVerification = () => {
     selfie: null,
   });
   const [submitting, setSubmitting] = useState(false);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -54,10 +55,10 @@ const KYCVerification = () => {
   }, [navigate]);
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: files ? files[0] : e.target.value,
     }));
   };
 
@@ -108,7 +109,8 @@ const KYCVerification = () => {
         },
       });
 
-      alert("KYC successfully submitted!");
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
       navigate('/profile');
     } catch (err) {
       console.error("Submission error:", err);
@@ -179,7 +181,7 @@ const KYCVerification = () => {
               accept="image/*,application/pdf"
               onChange={handleChange}
             />
-            <small> If you have a passport, just click "Next".</small>
+            <small>If you have a passport, just click "Next".</small>
           </div>
         )}
 
@@ -196,9 +198,9 @@ const KYCVerification = () => {
         )}
 
         {step < 3 && (
-          <button 
-            type="button" 
-            onClick={handleNext} 
+          <button
+            type="button"
+            onClick={handleNext}
             className="kyc-navigate-button"
             disabled={submitting}
           >
@@ -216,6 +218,12 @@ const KYCVerification = () => {
           </button>
         )}
       </form>
+
+      {showToast && (
+        <div className="success-toast">
+          <span>KYC submitted successfully!</span>
+        </div>
+      )}
     </div>
   );
 };
