@@ -7,6 +7,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -36,7 +37,13 @@ const Register = () => {
         throw new Error(message);
       }
 
-      navigate('/login');
+      setShowSuccess(true);
+
+      setTimeout(() => {
+        setShowSuccess(false);
+        navigate('/login');
+      }, 3000);
+
     } catch (err) {
       setError(err.message);
     }
@@ -44,6 +51,14 @@ const Register = () => {
 
   return (
     <div className="auth-page">
+      {showSuccess && (
+        <div className="success-toast">
+          <div className="checkmark-circle">
+            <div className="checkmark"></div>
+          </div>
+          <div className="success-message">Registration successful!</div>
+        </div>
+      )}
       <div className="auth-form">
         <h2>Register</h2>
         {error && <div className="auth-error">{error}</div>}

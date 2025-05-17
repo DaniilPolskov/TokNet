@@ -14,13 +14,13 @@ const EditProfile = () => {
   const [is2FAEnabled, setIs2FAEnabled] = useState(false);
   const [kycSubmitted, setKycSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("access_token");
         if (!token) {
-          alert("You are not authorized.");
           navigate("/login");
           return;
         }
@@ -37,9 +37,7 @@ const EditProfile = () => {
         setAvatarUrl(user.profile_picture);
         setIs2FAEnabled(user.is_2fa_enabled);
         setKycSubmitted(user.kyc_submitted);
-      } catch (err) {
-        console.error("Profile loading error:", err);
-        alert("Profile loading error.");
+      } catch {
         navigate("/login");
       } finally {
         setIsLoading(false);
@@ -52,10 +50,7 @@ const EditProfile = () => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        alert("You are not authorized.");
-        return;
-      }
+      if (!token) return;
 
       const formData = new FormData();
       formData.append("username", username);
@@ -74,10 +69,11 @@ const EditProfile = () => {
         },
       });
 
-      alert("The changes have been saved!");
-      navigate("/profile");
-    } catch (err) {
-      console.error("Retention Error:", err);
+      setShowToast(true);
+      setTimeout(() => {
+        navigate("/profile");
+      }, 2500);
+    } catch {
       alert("Failed to save profile.");
     }
   };
@@ -93,19 +89,15 @@ const EditProfile = () => {
   const handleDisable2FA = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      if (!token) {
-        alert("You are not authorized.");
-        return;
-      }
+      if (!token) return;
 
       await axios.post("http://localhost:8000/api/2fa/disable/", {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       setIs2FAEnabled(false);
-      alert("2FA deactivated.");
-    } catch (err) {
-      console.error("Error when disabling 2FA:", err);
+      setShowToast(true);
+    } catch {
       alert("Failed to disable 2FA.");
     }
   };
@@ -152,7 +144,7 @@ const EditProfile = () => {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Enter the current password"
+              placeholder="Enter current password"
             />
           </div>
 
@@ -162,7 +154,7 @@ const EditProfile = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Leave blank if you are not changing"
+              placeholder="Leave blank if unchanged"
             />
           </div>
 
@@ -195,6 +187,34 @@ const EditProfile = () => {
           </button>
         </div>
       </div>
+
+      {showToast && (
+        <div className="success-toast">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle
+              cx="10"
+              cy="10"
+              r="9"
+              stroke="#00ffae"
+              strokeWidth="2"
+              fill="none"
+              style={{
+                strokeDasharray: 157,
+                strokeDashoffset: 0,
+                animation: 'circle-animation 0.6s ease forwards',
+              }}
+            />
+            <path
+              d="M6 10L9 13L14 7"
+              stroke="#00ffae"
+              strokeWidth="2"
+              fill="none"
+              style={{ animation: 'drawCheck 0.5s ease forwards' }}
+            />
+          </svg>
+          <span className="success-message">Changes saved!</span>
+        </div>
+      )}
     </div>
   );
 };

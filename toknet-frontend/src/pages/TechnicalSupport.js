@@ -18,8 +18,7 @@ const TechnicalSupport = () => {
     const templateParams = {
       user_email: userEmail,
       title: reason,
-      message: message,
-      to_email: 'info.toknet@gmail.com'
+      message: message
     };
 
     emailjs.send(
@@ -79,7 +78,29 @@ const TechnicalSupport = () => {
 
       {showToast && (
         <div className="success-toast">
-          <span>Message sent successfully!</span>
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle
+              cx="10"
+              cy="10"
+              r="9"
+              stroke="#00ffae"
+              strokeWidth="2"
+              fill="none"
+              style={{
+                strokeDasharray: 157,
+                strokeDashoffset: 0,
+                animation: 'circle-animation 0.6s ease forwards',
+              }}
+            />
+            <path
+              d="M6 10L9 13L14 7"
+              stroke="#00ffae"
+              strokeWidth="2"
+              fill="none"
+              style={{ animation: 'drawCheck 0.5s ease forwards' }}
+            />
+          </svg>
+          <span className="success-message">Message sent!</span>
         </div>
       )}
     </div>
