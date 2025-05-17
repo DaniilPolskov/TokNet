@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist&display=swap');
+
 body {
   margin: 0;
   font-family: 'Arial', sans-serif;
@@ -9,27 +11,6 @@ body {
   padding: 0 40px;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 30px 0;
-}
-
-.nav a {
-  color: #fff;
-  margin-left: 10px;
-  text-decoration: none;
-  font-size: 17px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.nav .sign-up {
-  background-color: #1B1C1D;
-}
-
 .main-banner {
   text-align: center;
   margin-top: -10px;
@@ -38,14 +19,14 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Urbanist', sans-serif;
 }
 
 .main-banner h1 {
   font-size: 72px;
   line-height: 1.3;
   margin: 0;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Urbanist', sans-serif;
 }
 
 .main-banner p {
@@ -109,7 +90,7 @@ body {
 .dropdown-item {
   padding: 8px 16px;
   cursor: pointer;
-  font-family: 'Lato', sans-serif;
+  font-family: 'Urbanist', sans-serif;
 }
 
 .dropdown-item:hover {
@@ -132,6 +113,11 @@ body {
   justify-content: space-between;
   margin-bottom: 20px;
   font-size: 20px;
+.exchange-values {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 20px;
 }
 
 .input-box {
@@ -143,29 +129,19 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-
-.crypto-info {
+.input-box {
+  background-color: #1A1A1A;
+  border-radius: 12px;
+  padding: 20px;
+  flex: 1;
+  margin: 0 10px;
   display: flex;
-  align-items: center;
-  margin-bottom: 8px;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.crypto-info img {
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
-  
-}
-
-.crypto-symbol {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ccc;
-}
-
-.crypto-input {
-  background-color: transparent;
+.resend-button {
+  background: none;
   border: none;
   font-size: 28px;
   font-weight: bold;
@@ -189,48 +165,5 @@ body {
 .label {
   margin-top: 8px;
   font-size: 14px;
-  color: #777;
-}
-
-.exchange-rate {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 18px;
-  color: #aaa;
-  margin-top: 20px;
-}
-
-.exchange-rate-label {
-  margin-right: 10px;
-  font-weight: bold;
-}
-
-.exchange-rate-value {
-  font-weight: bold;
-}
-
-.buttom-banners {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 30px;
-  margin: 60px auto;
-  max-width: 1000px;
-}
-
-.buttom-banner h3 {
-  font-size: 34px;
-  margin-bottom: 8px;
-}
-
-.buttom-banner p {
-  font-size: 24px;
-  color: #aaa;
-}
-
-.crypto-icon {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-  transition: transform 0.3s ease;
+  text-decoration: underline;
 }

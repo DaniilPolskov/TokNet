@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+    font-family: 'Urbanist', sans-serif;
+    }
   
   html, body {
     height: 100%;
@@ -47,6 +50,6 @@
   }
   
   input:focus, select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-  }
+    border-color: #555555;
+    box-shadow: 0 0 0 3px rgba(85, 85, 85, 0.25);
+}

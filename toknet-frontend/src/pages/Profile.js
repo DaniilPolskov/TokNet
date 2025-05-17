@@ -1,154 +1,195 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import './styles/Profile.css';
+
+const levelsData = [
+  { level: 'LVL 0', volume: 0, swap: '2%' },
+  { level: 'LVL 1', volume: 100, swap: '1.5%' },
+  { level: 'LVL 2', volume: 1000, swap: '1.45%' },
+  { level: 'LVL 3', volume: 3000, swap: '1.4%' },
+  { level: 'LVL 4', volume: 50000, swap: '1.35%' },
+  { level: 'LVL 5', volume: 100000, swap: '1.3%' },
+];
 
 const Profile = () => {
-  const [userData, setUserData] = useState({
-    first_name: '',
-    last_name: '',
-    middle_name: '',
-    date_of_birth: '',
-    address: '',
-    profile_picture: null,
-  });
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  const token = localStorage.getItem('access_token');
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [receivedCount, setReceivedCount] = useState(0);
+  const [userLevel, setUserLevel] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/profile/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const token = localStorage.getItem('access_token');
+        if (!token) throw new Error('Please login to access this page');
+
+        const profileResponse = await axios.get('http://localhost:8000/api/profile/', {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setUserData(response.data);
+
+        setUser(profileResponse.data);
+
+        const txResponse = await axios.get('http://localhost:8000/api/exchange/history/', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const receivedTransactions = txResponse.data.filter(tx => tx.status === 'received');
+        setReceivedCount(receivedTransactions.length);
+
+        let total = 0;
+        receivedTransactions.forEach((tx) => {
+          const from = tx.from_currency?.toUpperCase();
+          const to = tx.to_currency?.toUpperCase();
+          if (from === 'USDT') total += parseFloat(tx.amount) || 0;
+          else if (to === 'USDT') total += parseFloat(tx.receive_amount) || 0;
+        });
+
+        const level = calculateUserLevel(total);
+        setUserLevel(level);
       } catch (err) {
-        setError('Failed to fetch user data');
+        console.error('Profile load error:', err);
+        setError(err.message);
+        if (err.response?.status === 401) {
+          localStorage.removeItem('access_token');
+          navigate('/login');
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [token]);
+  }, [navigate]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
-
-  const handlePhotoChange = (e) => {
-    setUserData((prevData) => ({
-      ...prevData,
-      profile_picture: e.target.files[0],
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData();
-    for (const key in userData) {
-      if (userData[key]) {
-        formData.append(key, userData[key]);
-      }
+  const calculateUserLevel = (total) => {
+    for (let i = levelsData.length - 1; i >= 0; i--) {
+      if (total >= levelsData[i].volume) return i;
     }
-
-    try {
-      const response = await axios.put('http://localhost:8000/api/profile/update/', formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (response.status === 200) {
-        setSuccess('Profile updated successfully');
-      }
-    } catch (err) {
-      setError('Failed to update profile');
-    }
+    return 0;
   };
+
+  const handleEditClick = () => navigate('/profile/edit');
+  const handleHistoryClick = () => navigate('/profile/transactions');
+  const handleLevelClick = () => navigate('/profile/level');
+  const handleFaqClick = () => navigate('/profile/faq');
+
+  if (loading) {
+    return (
+      <div className="profile-container">
+        <div className="spinner"></div>
+        <p>Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="profile-container">
+        <div className="profile-error">
+          <h3>Profile Error</h3>
+          <p>{error}</p>
+          <div className="error-actions">
+            <button onClick={() => window.location.reload()}>Retry</button>
+            <button onClick={() => navigate('/login')}>Login</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="profile-container">
+        <div className="profile-empty">
+          <p>No profile data available</p>
+          <button onClick={() => navigate('/login')}>Go to Login</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-container">
-      <h2>User Profile</h2>
-      {error && <p className="error">{error}</p>}
-      {success && <p className="success">{success}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>First Name</label>
-          <input
-            type="text"
-            name="first_name"
-            value={userData.first_name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Last Name</label>
-          <input
-            type="text"
-            name="last_name"
-            value={userData.last_name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Middle Name</label>
-          <input
-            type="text"
-            name="middle_name"
-            value={userData.middle_name}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Birth Date</label>
-          <input
-            type="date"
-            name="date_of_birth"
-            value={userData.date_of_birth}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Address</label>
-          <input
-            type="text"
-            name="address"
-            value={userData.address}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label>Profile Photo</label>
-          <input
-            type="file"
-            name="profile_picture"
-            onChange={handlePhotoChange}
-          />
-          {userData.profile_picture && (
-            <div className="preview">
-              <img
-                src={`http://localhost:8000${userData.profile_picture}`}
-                alt="Profile"
-                width="150"
-              />
-            </div>
+      <div className="profile-header">
+        <div className="avatar-preview">
+          {user.profile_picture ? (
+            <img
+              src={user.profile_picture || '/images/default.svg'}
+              alt="avatar"
+              className="avatar-img"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/images/default.svg';
+              }}
+            />
+          ) : (
+            <span className="avatar-text">?</span>
           )}
         </div>
 
-        <button type="submit">Update Profile</button>
-      </form>
+        <div className="user-info">
+          <div className="user-info-container">
+            <div className="info-block">
+              <h2 className="username">{user.username}</h2>
+            </div>
+
+            {user.show_location && user.address && (
+              <div className="info-block">
+                <span className="location">{user.address}</span>
+              </div>
+            )}
+
+            <div className="info-block">
+              <span><strong>Enable 2FA:</strong> {user.is_2fa_enabled ? 'Yes' : 'No'}</span>
+            </div>
+
+            <div className="info-block">
+              <span><strong>Completed KYC:</strong> {user.kyc_submitted ? 'Yes' : 'No'}</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="stats-container">
+          <div className="stat-block">
+            <div className="stat-number">{receivedCount}</div>
+            <div className="stat-label">Transactions</div>
+          </div>
+          <div className="stat-block">
+            <div className="stat-number">LVL {userLevel}</div>
+            <div className="stat-label">Your level</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="actions-section-container">
+        <div className="actions-section">
+          <button className="action-button" onClick={handleEditClick}>
+            {isMobile ? 'Edit' : 'Edit profile'}
+          </button>
+          <button className="action-button" onClick={handleHistoryClick}>
+            {isMobile ? 'History' : 'History'}
+          </button>
+          <button className="action-button" onClick={handleLevelClick}>
+            {isMobile ? 'Level' : 'Level'}
+          </button>
+          <button className="action-button" onClick={handleFaqClick}>
+            FAQ
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

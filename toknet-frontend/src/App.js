@@ -2,10 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Homepage from './components/Homepage';
-//import Footer from './components/Footer';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile.js';
+import KYCVerification from './pages/KYCVerification.js';
+import TransactionHistory from './pages/TransactionHistory.js';
+import UserLevel from './pages/UserLevel.js';
+import FAQ from './pages/FAQ.js';
+import Enable2FA from './components/Enable2FA';
+import TechnicalSupport from './pages/TechnicalSupport.js';
+import CryptoExchangePage from './components/CryptoExchange';
+import ExchangeStep2 from './components/ExchangeStep2';
+import OrderCancelled from './components/OrderCancelled';
+import RulesPage from './pages/RulesPage.js';
+
 import './global.css';
 import './App.css';
 
@@ -66,13 +77,53 @@ function App() {
               element={<Login onLogin={handleLogin} />} 
             />
             <Route 
-              path="/singup" 
+              path="/register" 
               element={<Register onRegister={handleRegister} />} 
             />
             <Route 
               path="/profile" 
               element={<Profile user={user} onProfileUpdate={handleProfileUpdate} />} 
             />
+            <Route 
+              path="/profile/edit" 
+              element={<EditProfile />}
+            /> 
+            <Route path="/profile/edit/KYCVerification" 
+            element={<KYCVerification />} 
+            />
+            <Route path="/profile/transactions" 
+            element={<TransactionHistory />} 
+            />
+            <Route path="/profile/faq" 
+            element={<FAQ />} 
+            />
+
+            <Route path="/profile/Level"
+            element={<UserLevel />} />
+            
+            <Route path="/profile/edit/enable2FA"
+            element={<Enable2FA />} />
+            
+            <Route path="/exchange" 
+            element={<CryptoExchangePage />} 
+            />
+            
+            <Route path="/exchange/step2"
+            element={<ExchangeStep2 />} 
+            />
+            
+            <Route path="/order-cancelled" 
+            element={<OrderCancelled />} 
+            />
+
+            <Route path="/technical-support" 
+            element={<TechnicalSupport />} 
+            />
+
+            <Route path="/rules" 
+            element={<RulesPage />} 
+            />
+
           </Routes>
         </main>
       </div>

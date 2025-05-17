@@ -152,3 +152,110 @@
   margin-left: 0.5rem;
   color: #555;
 }
+
+.success-toast {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: #1a1a1a;
+  border-left: 4px solid #00ffae;
+  padding: 16px 20px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 174, 0.2);
+  z-index: 1000;
+  animation: fadeInOut 3s ease-in-out forwards;
+  
+  /* ✅ Добавьте эти строки */
+  max-width: 320px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.success-message {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.checkmark-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #00ffae;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.checkmark {
+    width: 6px;
+    height: 12px;
+    border-right: 2px solid #00ffae;
+    border-bottom: 2px solid #00ffae;
+    transform: rotate(45deg);
+    animation: drawCheck 0.3s ease forwards;
+}
+
+@keyframes drawCheck {
+    0% {
+      height: 0;
+      width: 0;
+    }
+    100% {
+      height: 12px;
+      width: 6px;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@media (max-width: 480px) {
+  .success-toast {
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    width: auto;
+  }
+    .auth-form {
+    margin: 1rem 1rem;
+    padding: 1.5rem;
+    max-width: 100%;
+    border-radius: 6px;
+  }
+
+  .auth-form h2 {
+    font-size: 1.5rem;
+  }
+
+  .form-group label {
+    font-size: 0.85rem;
+  }
+
+  .form-group input {
+    font-size: 1rem;
+    padding: 0.65rem;
+  }
+
+  .auth-button {
+    font-size: 1rem;
+    padding: 0.85rem;
+  }
+
+  .success-toast {
+    top: 16px;
+    right: 16px;
+    left: 16px;
+    max-width: none;
+    width: 90vw;
+    white-space: normal;
+    padding: 14px 18px;
+  }
+}
