@@ -126,8 +126,26 @@ body {
   align-items: flex-start;
 }
 
-.resend-button {
-  background: none;
+.crypto-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.crypto-info img {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.crypto-symbol {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ccc;
+}
+
+.crypto-input {
+  background-color: transparent;
   border: none;
   font-size: 28px;
   font-weight: bold;
@@ -151,5 +169,131 @@ body {
 .label {
   margin-top: 8px;
   font-size: 14px;
-  text-decoration: underline;
+  color: #777;
+}
+
+.exchange-rate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: #aaa;
+  margin-top: 20px;
+}
+
+.exchange-rate-label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.exchange-rate-value {
+  font-weight: bold;
+}
+
+.buttom-banners {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin: 60px auto;
+  max-width: 1000px;
+}
+
+.buttom-banner h3 {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.buttom-banner p {
+  font-size: 24px;
+  color: #aaa;
+}
+
+.crypto-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .homepage {
+    padding: 0 20px;
+  }
+
+  .main-banner h1 {
+    font-size: 40px;
+  }
+
+  .main-banner p {
+    font-size: 14px;
+    max-width: 100%;
+    margin: 15px 0;
+  }
+
+  .exchange-box {
+    width: 90vw;
+    padding: 20px;
+    margin: 40px auto 100px;
+  }
+
+  .crypto-select-container {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .crypto-select {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .dropdown-list {
+    width: 100px !important;
+  }
+
+  .exchange-values {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .input-box {
+    margin: 0;
+    width: 100%;
+    padding: 15px;
+  }
+
+  .crypto-input, .crypto-output {
+    font-size: 24px;
+  }
+
+  .exchange-rate {
+    flex-direction: column;
+    font-size: 16px;
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .start-btn {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+
+  .buttom-banners {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 100%;
+    margin: 40px auto;
+  }
+
+  .buttom-banner h3 {
+    font-size: 24px;
+  }
+
+  .buttom-banner p {
+    font-size: 16px;
+  }
+
+  .crypto-icon {
+    width: 30px;
+    height: 30px;
+  }
 }
