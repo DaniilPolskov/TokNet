@@ -10,7 +10,6 @@ import KYCVerification from './pages/KYCVerification.js';
 import TransactionHistory from './pages/TransactionHistory.js';
 import UserLevel from './pages/UserLevel.js';
 import FAQ from './pages/FAQ.js';
-import UserProfile from './pages/UserProfile';
 import Enable2FA from './components/Enable2FA';
 import TechnicalSupport from './pages/TechnicalSupport.js';
 import CryptoExchangePage from './components/CryptoExchange';
@@ -89,9 +88,6 @@ function App() {
               path="/profile/edit" 
               element={<EditProfile />}
             /> 
-            <Route path="/user/:id" 
-            element={<UserProfile />} 
-            />
             <Route path="/profile/edit/KYCVerification" 
             element={<KYCVerification />} 
             />
