@@ -1,1 +1,1 @@
-TokNet — это платформа для обмена цифровыми активами. Пользователи могут безопасно обменивать криптовалюту, подключать 2FA, просматривать историю транзакций и зарабатывать уровни аккаунта.
+TokNet is a decentralized platform for exchanging digital assets. Users can securely exchange cryptocurrency, connect 2FA, view transaction history and earn account levels.
