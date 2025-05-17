@@ -50,3 +50,36 @@
   background: #333;
   color: #fff;
 }  
+
+@media (max-width: 480px) {
+  .cancelled-wrapper {
+    padding: 40px 16px 16px;
+    align-items: center;
+  }
+
+  .cancelled-box {
+    padding: 24px 16px;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .cancelled-box h2 {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .cancelled-box p {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .support-btn,
+  .back-btn {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    padding: 14px;
+    font-size: 1rem;
+    border-radius: 6px;
+  }
+}

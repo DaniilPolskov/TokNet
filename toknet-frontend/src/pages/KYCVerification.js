@@ -221,7 +221,10 @@ const KYCVerification = () => {
 
       {showToast && (
         <div className="success-toast">
-          <span>KYC submitted successfully!</span>
+          <div className="checkmark-circle">
+            <div className="checkmark"></div>
+          </div>
+          <div className="success-message">KYC submitted successfully!</div>
         </div>
       )}
     </div>

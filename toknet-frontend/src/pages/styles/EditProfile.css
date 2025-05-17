@@ -108,6 +108,7 @@
 }
 
 .success-toast {
+    all: unset;
     position: fixed;
     top: 30px;
     right: 30px;
@@ -164,4 +165,47 @@
     10% { opacity: 1; transform: translateY(0); }
     90% { opacity: 1; }
     100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .edit-profile-container {
+    padding: 1rem;
+  }
+
+  .edit-profile-card {
+    flex-direction: column;
+    width: 100%;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .edit-avatar-section {
+    margin-right: 0;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .avatar-preview {
+    width: 120px;
+    height: 160px;
+  }
+
+  .form-section {
+    gap: 0.75rem;
+  }
+
+  .form-block input[type="text"],
+  .form-block input[type="email"],
+  .form-block input[type="password"],
+  .kyc-button,
+  .save-button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .save-button,
+  .kyc-button {
+    padding: 1rem;
+    font-size: 1rem;
+  }
 }

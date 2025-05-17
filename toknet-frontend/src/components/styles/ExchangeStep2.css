@@ -409,3 +409,83 @@
       transform: rotate(360deg);
     }
   }
+
+  @media (max-width: 768px) {
+  .exchange-2-box {
+    flex-direction: column;
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .exchange-2-left, .exchange-2-right {
+    flex: unset;
+    width: 100%;
+  }
+
+  .copy-box {
+    font-size: 16px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    word-break: break-all;
+  }
+
+  .qr-button, .confirm-btn, .support-btn, .cancel-btn {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .info-box, .instruction, .support-note, .confirm-section {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .step-indicator {
+    flex-wrap: wrap;
+  }
+
+  .confirmation-phase {
+    margin-top: 0;
+    padding: 20px 12px;
+  }
+
+  .completed-box {
+    transform: none;
+    padding: 20px;
+  }
+
+  .completed-container {
+    padding-top: 30px;
+  }
+
+  .completed-title {
+    font-size: 20px;
+  }
+
+  .completed-text {
+    font-size: 14px;
+  }
+
+  .order-info {
+    padding: 16px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .success-toast {
+    right: 16px;
+    left: 16px;
+    top: 20px;
+    width: auto;
+    font-size: 13px;
+  }
+
+  .qr-code {
+    width: 100%;
+    max-width: 240px;
+    height: auto;
+  }
+}

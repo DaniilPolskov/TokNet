@@ -54,3 +54,42 @@
   font-size: 0.9rem;
   margin-top: 4px;
 }
+
+@media (max-width: 600px) {
+  .enable-2fa-container {
+    padding: 20px 10px;
+  }
+
+  .enable-2fa-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .qr-code-img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .enable-button,
+  .disable-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .form-block input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  .form-block label {
+    font-size: 13px;
+  }
+
+  h2 {
+    font-size: 20px;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}

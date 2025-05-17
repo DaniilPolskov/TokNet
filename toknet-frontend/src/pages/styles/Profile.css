@@ -79,16 +79,6 @@
   font-weight: 600;
 }
 
-.token-btc {
-  background-color: #FFC107;
-  color: #121212;
-}
-
-.token-eth {
-  background-color: #FF5722;
-  color: #fff;
-}
-
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -145,24 +135,6 @@
   text-align: center;
 }
 
-.wallet-section {
-  margin-top: 2rem;
-}
-
-.wallet-title {
-  font-family: 'Urbanist', sans-serif;
-  font-weight: 600;
-  font-size: 1.125rem;
-  color: white;
-}
-
-.wallet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
 .view-all-button {
   font-family: 'Urbanist', sans-serif;
   font-weight: 600;
@@ -197,35 +169,6 @@
   flex-direction: column;
   justify-content: space-between;
   font-family: 'Urbanist', sans-serif;
-}
-
-.currency-name {
-  font-size: 0.875rem;
-  color: #999999;
-  font-weight: 500;
-}
-
-.currency-balance {
-  font-size: 1.25rem;
-  font-weight: 500;
-  color: white;
-}
-
-.pnl {
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-}
-
-.positive {
-  color: #4CAF50;
-}
-
-.negative {
-  color: #F44336;
-}
-
-.neutral {
-  color: #9E9E9E;
 }
 
 .actions-section-container {
@@ -300,23 +243,6 @@
   color: white;
   margin-bottom: 1rem;
   background-color: #1A1A1A;
-}
-
-.token-list {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.rating-level {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 4px;
-}
-
-.rating {
-  font-size: 1rem;
-  color: gold;
 }
 
 .level {
@@ -586,4 +512,145 @@
   .details-column {
     margin-top: 1rem;
   }
+}
+
+/* Mobile Adaptations */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1rem;
+    margin: 1rem auto;
+    min-height: calc(100vh - 120px);
+    gap: 1.5rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+  }
+
+  .avatar-text {
+    font-size: 2rem;
+  }
+
+  .user-info {
+    width: 100%;
+  }
+
+  .user-info-container {
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .info-block {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .username {
+    text-align: center;
+    font-size: 1.5rem;
+  }
+
+  .stats-container {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .stat-block {
+    width: 48%;
+    height: auto;
+    padding: 0.75rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .actions-section-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 0.75rem;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .actions-section {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .action-button {
+    height: 80px;
+    padding: 0.5rem;
+    font-size: 16px;
+  }
+
+  .wallet-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .wallet-card {
+    width: 100%;
+  }
+
+  .transaction-header,
+  .transaction-row {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-row > div,
+  .transaction-header > div {
+    padding-bottom: 0.75rem;
+  }
+
+  .details-column {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .actions-section {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .action-button {
+    height: 60px;
+    font-size: 14px;
+  }
+  .transaction-filters {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 8px;
+}
+
+.filter-button {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.profile-container {
+  padding-bottom: 100px;
+}
 }

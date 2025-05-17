@@ -19,6 +19,16 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [receivedCount, setReceivedCount] = useState(0);
   const [userLevel, setUserLevel] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -155,10 +165,11 @@ const Profile = () => {
         <div className="stats-container">
           <div className="stat-block">
             <div className="stat-number">{receivedCount}</div>
-            <div className="stat-label">Transaction count</div>
+            <div className="stat-label">Transactions</div>
           </div>
           <div className="stat-block">
             <div className="stat-number">LVL {userLevel}</div>
+            <div className="stat-label">Your level</div>
           </div>
         </div>
       </div>
@@ -166,13 +177,13 @@ const Profile = () => {
       <div className="actions-section-container">
         <div className="actions-section">
           <button className="action-button" onClick={handleEditClick}>
-            Edit profile
+            {isMobile ? 'Edit' : 'Edit profile'}
           </button>
           <button className="action-button" onClick={handleHistoryClick}>
-            History
+            {isMobile ? 'History' : 'History'}
           </button>
           <button className="action-button" onClick={handleLevelClick}>
-            Level
+            {isMobile ? 'Level' : 'Level'}
           </button>
           <button className="action-button" onClick={handleFaqClick}>
             FAQ

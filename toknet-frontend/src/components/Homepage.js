@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './styles/Homepage.css';
 import btcIcon from '../icons/btc.svg';
@@ -13,7 +14,8 @@ export default function HomePage() {
   const [amount, setAmount] = useState(1);
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
-
+  const navigate = useNavigate();
+  
   const availableCryptos = [
     { symbol: 'BTC', name: 'Bitcoin', icon: btcIcon },
     { symbol: 'ETH', name: 'Ethereum', icon: ethIcon },
@@ -60,7 +62,9 @@ export default function HomePage() {
         <h1>Crypto Easily</h1>
         <p>Sign up now and start exchanging your favorite cryptocurrencies.</p>
         <div style={{ textAlign: 'center' }}>
-          <button className="start-btn">Get Started</button>
+          <button className="start-btn" onClick={() => navigate('/login')}>
+            Get Started
+          </button>
         </div>
       </section>
 

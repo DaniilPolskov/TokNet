@@ -13,7 +13,7 @@ export default function CryptoExchange() {
   const [amount, setAmount] = useState("");
   const [receiveAddress, setReceiveAddress] = useState("");
   const [exchangeRate, setExchangeRate] = useState(null);
-  const [feeRate, setFeeRate] = useState(0.002);
+  const [feeRate, setFeeRate] = useState(0.02);
   const [showFromDropdown, setShowFromDropdown] = useState(false);
   const [showToDropdown, setShowToDropdown] = useState(false);
   const [cryptoData, setCryptoData] = useState({});
