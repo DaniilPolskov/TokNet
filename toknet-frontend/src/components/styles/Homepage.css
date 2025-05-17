@@ -113,22 +113,8 @@ body {
   justify-content: space-between;
   margin-bottom: 20px;
   font-size: 20px;
-.exchange-values {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  font-size: 20px;
 }
 
-.input-box {
-  background-color: #1A1A1A;
-  border-radius: 12px;
-  padding: 20px;
-  flex: 1;
-  margin: 0 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
 .input-box {
   background-color: #1A1A1A;
   border-radius: 12px;
