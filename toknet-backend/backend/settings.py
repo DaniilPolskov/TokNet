@@ -79,7 +79,7 @@ DATABASES = {
         'NAME': 'toknet_db',
         'USER': 'admin',
         'PASSWORD': '6540',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }

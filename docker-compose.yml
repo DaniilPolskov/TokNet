@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    container_name: toknet_db
+    environment:
+      POSTGRES_DB: toknet_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 6540
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    volumes:
+      - ./toknet-backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      POSTGRES_DB: toknet_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 6540
+      PYTHONDONTWRITEBYTECODE: 1
+      PYTHONUNBUFFERED: 1
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    volumes:
+      - ./toknet-frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+
+
