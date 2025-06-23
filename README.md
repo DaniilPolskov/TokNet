@@ -1,5 +1,3 @@
----
-
 # TokNet
 
 TokNet is a web application built with a modern tech stack, featuring Django and Django REST Framework for the backend and React for the frontend. The project uses PostgreSQL, Docker, and provides functionality such as QR code generation, authentication, and API integration.
@@ -8,27 +6,27 @@ TokNet is a web application built with a modern tech stack, featuring Django and
 
 ### Backend
 
-* Python
-* Django 5.2
-* Django REST Framework
-* SimpleJWT
-* PostgreSQL
-* Docker
+* Python  
+* Django 5.2  
+* Django REST Framework  
+* SimpleJWT  
+* PostgreSQL  
+* Docker  
 
 ### Frontend
 
-* React 19
-* React Router DOM
-* Styled Components
-* Axios
-* Cloudinary (for image uploads)
-* EmailJS
-* QRCode generation
+* React 19  
+* React Router DOM  
+* Styled Components  
+* Axios  
+* Cloudinary (for image uploads)  
+* EmailJS  
+* QRCode generation  
 
 ### DevOps
 
-* Docker and Docker Compose
-* Nginx (optional)
+* Docker and Docker Compose  
+* Nginx (optional)  
 * Kubernetes (optional)
 
 ---
@@ -90,5 +88,3 @@ For production deployment, it is recommended to:
 * Use nginx as a reverse proxy
 * Configure environment variables using `.env` files
 * Set up HTTPS using services like Let's Encrypt
-
----
